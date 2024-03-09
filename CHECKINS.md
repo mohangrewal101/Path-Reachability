@@ -41,13 +41,13 @@ There are several features that the group still needs to design:
 
 ## Planned division of main responsibilities between team members.
 
-| Name    | Responsibilities                                           |
-| ------- | ---------------------------------------------------------- |
-| Alex    | Project setup, create data definitions and helper classes. |
-| Rodrigo |                                                            |
-| Will    |                                                            |
-| Mohan   |                                                            |
-| Kenny   |                                                            |
+| Name    | Responsibilities                                                          |
+| ------- | ------------------------------------------------------------------------- |
+| Alex    | Project setup, create data definitions and helper classes, video creation |
+| Rodrigo | Testing for AST Traversal                                                 |
+| Will    | AST Traversal implementation                                              |
+| Mohan   | Create conversion from AST Context to input for Z3                        |
+| Kenny   | Testing for Context transformation, video creation                        |
 
 ## Summary of progress so far.
 
@@ -55,15 +55,15 @@ So far the group has been conducting research on the Typescript AST and Z3. The 
 
 ## Roadmap for what should be done when, including specific goals for completion by future Milestones (propose at least three such goals per future Milestone, along with who will work on them; you can revise these later as needed).
 
-| Item                                             | Responsible Individual | Start Date | Expected Completion Date |
-| ------------------------------------------------ | ---------------------- | ---------- | ------------------------ |
-| Project Setup                                    | Alex                   | March 1    | March 8                  |
-| Create Data Definitions                          | Alex                   | March 9    | March 9                  |
-| AST Traversal Implementation                     |                        | March 10   | March 31                 |
-| AST Context Transformation for Z3 Implementation |                        | March 10   | March 31                 |
-| Testing - AST Traversal                          |                        | March 10   | March 31                 |
-| Testing - Context Transformation                 |                        | March 10   | March 31                 |
-| Integration Testing                              |                        | April 1    | April 4                  |
-| Demo Creation                                    |                        | April 3    | April 4                  |
-| Video Production                                 |                        | April 5    | April 6                  |
-| Project Submission                               | Everyone               |            | April 7                  |
+| Item                                             | Responsible Individual(s) | Start Date | Expected Completion Date |
+| ------------------------------------------------ | ------------------------- | ---------- | ------------------------ |
+| Project Setup                                    | Alex                      | March 1    | March 8                  |
+| Create Data Definitions                          | Alex                      | March 9    | March 9                  |
+| AST Traversal Implementation                     | Will                      | March 10   | March 31                 |
+| AST Context Transformation for Z3 Implementation | Mohan                     | March 10   | March 31                 |
+| Testing - AST Traversal                          | Rodrigo                   | March 10   | March 31                 |
+| Testing - Context Transformation                 | Kenny                     | March 10   | March 31                 |
+| Integration Testing                              | Everyone                  | April 1    | April 4                  |
+| Demo Creation                                    | Rodrigo                   | April 3    | April 4                  |
+| Video Production                                 | Alex, Kenny               | April 5    | April 6                  |
+| Project Submission                               | Everyone                  |            | April 7                  |
