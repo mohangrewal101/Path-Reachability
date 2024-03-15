@@ -119,6 +119,8 @@ Originally, the design of the analysis was to determine which code in the progra
 
 This was changed after a conversation with the TA this week, where the design pivoted to determining what all the potential paths through the program could be. From there, the conditional statements that determine the control flow through the program could be analyzed to see which paths could not be executed, based on if the chain of conditionals is satisfiable or not. Lastly, if there is time to implement this, the analysis tool will provide suggested program inputs that could go through all satisfiable paths.
 
+After conducting the user study, the only additional change that would be made to the design is the output. It should explicitly state if there were no un-executable branches found in the program.
+
 ## Progress against the timeline planned for your team, including the specific goals you defined (as part of Check-in 2) for Check-in 3; any revisions to future Check-in goals.
 
 The team may be a bit behind schedule, largely due to the pivot in design that occurred late this week. We need to spend some time determining how the analysis tool will determine the all the possible paths through a given program.
