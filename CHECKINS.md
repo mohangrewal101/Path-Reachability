@@ -76,6 +76,43 @@ The project will have a front-end where users can upload a program for analysis.
 
 ## Notes about first user study results.
 
+The first user study went fairly well. Two potential users were sampled. Each user was asked to create a small function that accepted at least one value. The function was to have a few conditional statements that depended on the function parameters.
+
+The first user submitted the following program:
+
+```
+export const getWeekend = (weekend: boolean) => {
+  let day;
+  if (weekend) {
+    day = 6;
+  } else {
+    day = 1;
+  }
+
+  if (day === 0 || day === 6) {
+    console.log('Weekend');
+  } else {
+    console.log('Weekday');
+  }
+};
+```
+
+This program yielded the following output:
+
+```
+Your possible execution paths are lines:
+1) 2,4,10
+2) 2,6,12
+
+Your possible testing path coverage: 100%
+
+Example test inputs for getWeekend to achieve 100% path coverage:
+weekend = true,
+weekend = false
+```
+
+The users thought this type of feedback was helpful, but wanted more explicit output indicating that there were no branches found that were not executable. One user suggested that for cases where branches were not executable, the analysis should provide suggestions for next steps. This however, does not seem like a feasible request for a small 6-week project.
+
 ## Any changes to original design.
 
 Originally, the design of the analysis was to determine which code in the program was unreachable based on the conditional statements required to get to a specific block. If the chain of conditional statements to get to a specific block was not satisfiable, then that block would be marked "unreachable".
