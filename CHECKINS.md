@@ -67,3 +67,21 @@ So far the group has been conducting research on the Typescript AST and Z3. The 
 | Demo Creation                                    | Rodrigo                   | April 3    | April 4                  |
 | Video Production                                 | Alex, Kenny               | April 5    | April 6                  |
 | Project Submission                               | Everyone                  |            | April 7                  |
+
+# Check-In 3 - March 15, 2024
+
+## Mockup of how your project is planned to operate (as used for your first user study). Include any sketches/examples/scenarios.
+
+The project will have a front-end where users can upload a program for analysis. The front-end will send the program to the server, where the analysis will be performed. The analysis will determine all potential execution paths through a program by keeping track of the conditional statements. The analysis will determine which paths cannot be executed (if the conditions required to work through a path are not satisfiable). If there is time to implement it, the program will suggest inputs to use to achieve the highest possible path coverage test score.
+
+## Notes about first user study results.
+
+## Any changes to original design.
+
+Originally, the design of the analysis was to determine which code in the program was unreachable based on the conditional statements required to get to a specific block. If the chain of conditional statements to get to a specific block was not satisfiable, then that block would be marked "unreachable".
+
+This was changed after a conversation with the TA this week, where the design pivoted to determining what all the potential paths through the program could be. From there, the conditional statements that determine the control flow through the program could be analyzed to see which paths could not be executed, based on if the chain of conditionals is satisfiable or not. Lastly, if there is time to implement this, the analysis tool will provide suggested program inputs that could go through all satisfiable paths.
+
+## Progress against the timeline planned for your team, including the specific goals you defined (as part of Check-in 2) for Check-in 3; any revisions to future Check-in goals.
+
+The team may be a bit behind schedule, largely due to the pivot in design that occurred late this week. We need to spend some time determining how the analysis tool will determine the all the possible paths through a given program.
