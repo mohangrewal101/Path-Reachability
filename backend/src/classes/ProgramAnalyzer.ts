@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
 import { Note } from "./Types";
+import { Condition } from "./Condition";
 
 const LOGGING = true;
 const WARNING = true;
@@ -52,28 +53,21 @@ export class ProgramAnalyzer {
     };
   }
 
-  addNote = (context: Context, node: ts.Node, note: string) => {
-    if (this.sourceFile) {
-      const { line: startLine } = this.sourceFile.getLineAndCharacterOfPosition(
-        node.getStart()
-      );
-      const { line: endLine } = this.sourceFile.getLineAndCharacterOfPosition(
-        node.getEnd()
-      );
-      const contextNote: Note = {
-        comment: note,
-        startLine,
-        endLine,
-      };
-      context.addNote(contextNote);
-    }
-  };
-
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<Note[]>((resolve) => {
-      const context = new Context();
+      const context = new Context({ topLevel: true });
       this.visitNode(context, sourceFile);
+      console.log("=========");
+      console.log("GETTING PATHS");
+      console.log("=========");
+      context.getPaths().forEach((path) => {
+        let pathArr = [];
+        path.forEach((condition) => {
+          pathArr.push(condition.toString());
+        });
+        console.log("[ " + pathArr.join(", "), "]");
+      });
       resolve(context.getNotes());
     });
   };
@@ -90,7 +84,6 @@ export class ProgramAnalyzer {
         ts.SyntaxKind[node.kind]
       );
     }
-    // ts.forEachChild(node, this.visitNode.bind(this, context));
   };
 
   visitExpressionStatement = (
@@ -123,18 +116,32 @@ export class ProgramAnalyzer {
   };
 
   visitSourceFile = (context: Context, node: ts.SourceFile) => {
-    console.log("found a source file: ", node.statements);
     node.statements.forEach((node: ts.Statement) => {
       this.visitNode(context, node);
     });
   };
 
   visitIfStatement = (context: Context, node: ts.IfStatement) => {
-    log("found an if statement: ");
-    this.visitNode(context, node.expression);
-    this.visitNode(context, node.thenStatement);
+    log("found an if statement");
+
+    let currContext: Context;
+    if (context.isTopLevel()) {
+      currContext = new Context({ context });
+      context.addTopLevelNode(currContext);
+    } else {
+      currContext = context;
+    }
+
+    const trueChild = new Context({ context: currContext });
+    currContext.setTrueChild(trueChild);
+    currContext.setCondition(node.expression);
+
+    this.visitNode(currContext, node.expression);
+    this.visitNode(trueChild, node.thenStatement);
     if (node.elseStatement) {
-      this.visitNode(context, node.elseStatement);
+      const falseChild = new Context({ context: currContext });
+      currContext.setFalseChild(falseChild);
+      this.visitNode(falseChild, node.elseStatement);
     }
   };
 
@@ -160,7 +167,8 @@ export class ProgramAnalyzer {
   };
 
   visitParameter = (context: Context, node: ts.ParameterDeclaration) => {
-    log("Found a parameter: ", node.name.getText());
+    log("Found a parameter: ", node.name.getText(), ": ", node.type.getText());
+    context.addVar(node.name.getText(), node.type.getText());
   };
 
   visitIdentifier = (context: Context, node: ts.Identifier) => {
@@ -230,19 +238,14 @@ export class ProgramAnalyzer {
 
   visitBlock = (context: Context, node: ts.Block) => {
     log("Visiting block");
-    const blockContext = new Context(context);
     node.getChildren().forEach((child) => {
-      this.visitNode(blockContext, child);
+      this.visitNode(context, child);
     });
-    context.addNotesList(blockContext.getNotes());
   };
 
   visitSyntaxList = (context: Context, node: ts.SyntaxList) => {
     log("visiting syntax list: ", node.getText());
     node.getChildren().forEach((child) => {
-      if (context.hasReturnFound()) {
-        this.addNote(context, child, "Unreachable code detected :(");
-      }
       this.visitNode(context, child);
     });
   };
@@ -278,7 +281,6 @@ export class ProgramAnalyzer {
 
   visitReturnStatement = (context: Context, node: ts.Node) => {
     log("Visiting return statement: ", node.getText());
-    context.setReturnFound(true);
   };
 
   visitThisKeyword = (context: Context, node: ts.Node) => {
