@@ -65,6 +65,7 @@ export class ProgramAnalyzer {
         let pathArr = [];
         path.forEach((condition) => {
           pathArr.push(condition.toString());
+          console.log("condition vars: ", condition.vars);
         });
         console.log("[ " + pathArr.join(", "), "]");
       });
@@ -198,6 +199,10 @@ export class ProgramAnalyzer {
     node: ts.VariableDeclaration
   ) => {
     log("Found variable declaration: ", node.getText());
+    if (node.type) {
+      context.addVar(node.name.getText(), node.type?.getText());
+    }
+
     this.visitNode(context, node.name);
 
     if (node.initializer) {
