@@ -10,5 +10,5 @@ To install project dependencies, follow these steps:
 To run the project, follow these steps:
 
 1. In one terminal, run `cd frontend && npm run dev` from the project root directory.
-2. In a second terminal, run `cd backend && npm run start` from the project root directory.
+2. In a second terminal, run `cd backend && npm run dev` from the project root directory.
 3. Open `localhost:5173` in your web browser.
