@@ -3,7 +3,7 @@ import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
 import { Note } from "./Types";
 import { Condition } from "./Condition";
-import {ContextToZ3} from "../../Z3_Conversion_Folder/ContextToZ3";
+import {ContextToZ3} from "./ContextToZ3";
 
 const LOGGING = true;
 const WARNING = true;
@@ -74,8 +74,7 @@ export class ProgramAnalyzer {
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter.checkPaths(context.getPaths())
-          .then((result) => {
-            console.log("Z3 Analysis result: ", result);
+          .then(() => {
             resolve(context.getNotes());
           })
           .catch((error) => {
