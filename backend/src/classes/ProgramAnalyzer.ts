@@ -2,7 +2,7 @@ import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
 import { Note } from "./Types";
-import { Condition } from "./Condition";
+import { getLineNumbers } from "./utils/utils";
 
 const LOGGING = true;
 const WARNING = true;
@@ -137,14 +137,14 @@ export class ProgramAnalyzer {
     currContext.setTrueChild(trueChild);
     currContext.setCondition(node.expression);
 
+    // get start and end line numbers for if statement
+    const { startLine, endLine } = getLineNumbers(this.sourceFile, node);
+    console.log("start line: ", startLine, "end line: ", endLine);
+    currContext.setStartLine(startLine);
+    currContext.setEndLine(endLine);
+
     this.visitNode(currContext, node.expression);
     this.visitNode(trueChild, node.thenStatement);
-		const start = node.expression.getStart(this.sourceFile);
-    const end = node.expression.getEnd();
-    const startLine = this.sourceFile?.getLineAndCharacterOfPosition(start).line || 0;
-    const endLine = this.sourceFile?.getLineAndCharacterOfPosition(end).line || 0;
-
-    log(`If statement condition start line: ${startLine + 1}, end line: ${endLine + 1}`);
 
     if (node.elseStatement) {
       const falseChild = new Context({ context: currContext });
