@@ -1,4 +1,4 @@
-function example(a: boolean, b: boolean) {
+function example(a: boolean, b: boolean, c: boolean) {
 	if (a) {
 		// do something
 	} else {
@@ -7,7 +7,6 @@ function example(a: boolean, b: boolean) {
 
 	if (b) {
 		// do something
-		const c: boolean = false;
 		if (c) {
 			// do something
 		} else {
