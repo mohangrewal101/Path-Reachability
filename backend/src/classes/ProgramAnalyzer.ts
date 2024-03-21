@@ -1,9 +1,9 @@
 import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
+import { ContextToZ3 } from "./ContextToZ3";
 import { Note } from "./Types";
-import { Condition } from "./Condition";
-import {ContextToZ3} from "./ContextToZ3";
+import { getLineNumbers } from "./utils/utils";
 
 const LOGGING = true;
 const WARNING = true;
@@ -73,14 +73,15 @@ export class ProgramAnalyzer {
 
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
-      contextToZ3Converter.checkPaths(context.getPaths())
-          .then(() => {
-            resolve(context.getNotes());
-          })
-          .catch((error) => {
-            console.error("Error during analysis: ", error);
-            reject(error);
-          });
+      contextToZ3Converter
+        .checkPaths(context.getPaths())
+        .then(() => {
+          resolve(context.getNotes());
+        })
+        .catch((error) => {
+          console.error("Error during analysis: ", error);
+          reject(error);
+        });
     });
   };
 
@@ -148,8 +149,15 @@ export class ProgramAnalyzer {
     currContext.setTrueChild(trueChild);
     currContext.setCondition(node.expression);
 
+    // get start and end line numbers for if statement
+    const { startLine, endLine } = getLineNumbers(this.sourceFile, node);
+    console.log("start line: ", startLine, "end line: ", endLine);
+    currContext.setStartLine(startLine);
+    currContext.setEndLine(endLine);
+
     this.visitNode(currContext, node.expression);
     this.visitNode(trueChild, node.thenStatement);
+
     if (node.elseStatement) {
       const falseChild = new Context({ context: currContext });
       currContext.setFalseChild(falseChild);
