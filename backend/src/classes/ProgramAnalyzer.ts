@@ -1,6 +1,7 @@
 import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
+import { ContextToZ3 } from "./ContextToZ3";
 import { Note } from "./Types";
 import { getLineNumbers } from "./utils/utils";
 
@@ -55,7 +56,7 @@ export class ProgramAnalyzer {
 
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
-    return new Promise<Note[]>((resolve) => {
+    return new Promise<Note[]>((resolve, reject) => {
       const context = new Context({ topLevel: true });
       this.visitNode(context, sourceFile);
       console.log("=========");
@@ -69,7 +70,18 @@ export class ProgramAnalyzer {
         });
         console.log("[ " + pathArr.join(", "), "]");
       });
-      resolve(context.getNotes());
+
+      console.log("Z3 Check");
+      const contextToZ3Converter = new ContextToZ3();
+      contextToZ3Converter
+        .checkPaths(context.getPaths())
+        .then(() => {
+          resolve(context.getNotes());
+        })
+        .catch((error) => {
+          console.error("Error during analysis: ", error);
+          reject(error);
+        });
     });
   };
 
