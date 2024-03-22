@@ -124,3 +124,47 @@ After conducting the user study, the only additional change that would be made t
 ## Progress against the timeline planned for your team, including the specific goals you defined (as part of Check-in 2) for Check-in 3; any revisions to future Check-in goals.
 
 The team may be a bit behind schedule, largely due to the pivot in design that occurred late this week. We need to spend some time determining how the analysis tool will determine the all the possible paths through a given program.
+
+# Check-In 4 - March 22, 2024
+
+## Status of implementation so far.
+
+The implementation is going great so far.
+We have implemented the bulk of the AST traversal to gather the required information for the analysis context object.
+We have also completed the context transformation to input to Z3 to the point where we are able to determine if a given path of boolean conditions is satisfiable or not.
+By Tuesday March 26 we are expecting to complete the MVP, where we are able to accept a program with boolean inputs, and output all possible paths through the program plus possible inputs for test cases where the path is satisfiable.
+Following completion of the MVP, we will extend the functionality to include numeric function parameters, more complex conditional statements, and possibly function calls if there is enough time remaining.
+
+## Plans for final user study.
+
+Once the MVP is completed next week, we will be able to begin the final user study.
+For this study, we will ask participants to use the MVP to analyze a simple program and examine the output.
+Users will be asked about the usefulness of the output, and to provide feedback on other information they would like to see.
+Based on the current rate of progress through the MVP, it is expected that we will administer the user study on March 26 or March 27.
+
+## Planned timeline for the remaining days.
+
+| Item                                                   | Responsible Individual(s) | Start Date | Expected Completion Date |
+| ------------------------------------------------------ | ------------------------- | ---------- | ------------------------ |
+| AST Traversal Implementation - MVP                     | Will                      | March 10   | March 26                 |
+| AST Context Transformation for Z3 Implementation - MVP | Mohan                     | March 10   | March 26                 |
+| MVP Completed                                          | Everyone                  |            | March 26                 |
+| AST Traversal - Stretch Goals                          | Will                      | March 26   | March 31                 |
+| Context Transformation - Stretch Goals                 | Mohan                     | March 26   | March 31                 |
+| Testing - AST Traversal                                | Rodrigo                   | March 10   | March 31                 |
+| Testing - Context Transformation                       | Kenny                     | March 10   | March 31                 |
+| Stretch Goals Completed                                | Everyone                  |            | March 31                 |
+| Integration Testing                                    | Everyone                  | April 1    | April 4                  |
+| Demo Creation                                          | Rodrigo                   | April 3    | April 4                  |
+| Video Production                                       | Alex, Kenny               | April 5    | April 6                  |
+| Project Submission                                     | Everyone                  |            | April 7                  |
+
+## Progress against the timeline planned for your team, including the specific goals you defined (originally as part of Check-in 2) for Check-in 4; any revisions to Check-in 5 goals.
+
+The team is making lots of progress against the planned timeline.
+We are expected to complete the first iteration of the project by March 26, which will include the ability to analyze simple programs with boolean parameters used in conditional statements.
+This analysis will return a list of possible paths, indicate which of these paths are satisfiable, and a set of parameter values that can be used to test the paths that are satisfiable.
+
+Since the MVP will be completed relatively early, the team will then focus on expanding the scope of the analysis to include programs with numeric parameters, and expanding the complexity of the conditional statements that can be analyzed.
+These are fairly small extensions to the capabilities of the MVP, so it is still expected the team will be able to meet this milestone by March 31.
+This timeline will give the team a full week to do extensive integration testing and documentation before producing the final video for submission.
