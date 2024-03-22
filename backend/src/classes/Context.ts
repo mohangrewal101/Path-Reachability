@@ -17,8 +17,10 @@ export class Context {
   private condition: ts.Expression;
   private notes: Note[];
   private contextNodes: Context[] = [];
-  private startLine: number;
-  private endLine: number;
+  private thenStartLine: number;
+  private thenEndLine: number;
+  private elseStartLine: number;
+  private elseEndLine: number;
 
   constructor({ context, topLevel }: ContextConstructorInterface) {
     if (context) {
@@ -91,12 +93,20 @@ export class Context {
     this.condition = condition;
   };
 
-  setStartLine = (line: number) => {
-    this.startLine = line;
+  setThenStartLine = (line: number) => {
+    this.thenStartLine = line;
   };
 
-  setEndLine = (line: number) => {
-    this.endLine = line;
+  setThenEndLine = (line: number) => {
+    this.thenEndLine = line;
+  };
+
+  setElseStartLine = (line: number) => {
+    this.elseStartLine = line;
+  };
+
+  setElseEndLine = (line: number) => {
+    this.elseEndLine = line;
   };
 
   getCondition = () => {
