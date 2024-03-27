@@ -41,21 +41,30 @@ export const PathSelector = ({ notes, onSelect }: PathSelectorProps) => {
         border: "solid",
         borderColor: "black",
         borderWidth: "1px",
-        height: "100%",
+        maxHeight: "500px",
+        overflow: "hidden",
       }}
     >
       <>
         <Typography variant="h6">Available Paths</Typography>
-        {notes.map((note, idx) => {
-          return (
-            <PathSelectorItem
-              key={idx}
-              note={note}
-              idx={idx}
-              onClick={handlePathClick}
-            />
-          );
-        })}
+        <Box
+          sx={{
+            height: "100%",
+            maxHeight: "470px",
+            overflow: "scroll",
+          }}
+        >
+          {notes.map((note, idx) => {
+            return (
+              <PathSelectorItem
+                key={idx}
+                note={note}
+                idx={idx}
+                onClick={handlePathClick}
+              />
+            );
+          })}
+        </Box>
       </>
     </Box>
   );

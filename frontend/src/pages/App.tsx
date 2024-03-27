@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useFileUpload } from "../hooks/useFileUpload";
 import { useAnalyzeProgram } from "../hooks/useAnalyzeProgram";
 import { CodeView } from "../components/CodeView";
-import { Grid } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import { Summary } from "../components/Summary";
 import { PathNote } from "../hooks/useAnalyzeProgram";
 import { PathSelector } from "../components/PathSelector";
@@ -27,17 +27,19 @@ function App() {
         (loading ? (
           <h3>Program is being analyzed</h3>
         ) : (
-          <Grid container sx={{ marginTop: 5, width: "100%" }} spacing={1}>
-            <Grid item xs={12} md={2} lg={2}>
-              <PathSelector notes={notes} onSelect={setPathNote} />
+          <Container sx={{ width: "100vw", padding: 0, margin: 0 }}>
+            <Grid container sx={{ marginTop: 5, width: "100%" }} spacing={1}>
+              <Grid item xs={12} md={2} lg={2}>
+                <PathSelector notes={notes} onSelect={setPathNote} />
+              </Grid>
+              <Grid item xs={12} md={5} lg={5}>
+                <CodeView fileContents={fileContents} note={pathNote} />
+              </Grid>
+              <Grid item xs={12} md={5} lg={5}>
+                <Summary note={pathNote} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={5} lg={5}>
-              <CodeView fileContents={fileContents} note={pathNote} />
-            </Grid>
-            <Grid item xs={12} md={5} lg={5}>
-              <Summary note={pathNote} />
-            </Grid>
-          </Grid>
+          </Container>
         ))}
     </>
   );

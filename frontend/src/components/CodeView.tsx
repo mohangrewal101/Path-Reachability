@@ -20,6 +20,8 @@ export const CodeView = ({ fileContents, note }: CodeViewProps) => {
           borderColor: "black",
           overflow: "scroll",
           width: "100%",
+          height: "100%",
+          maxHeight: "500px",
         }}
       >
         {fileSplit.map((line, index) => {
