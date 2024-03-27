@@ -62,6 +62,8 @@ export class Context {
   };
 
   print = () => {
+    console.log("Start Line: ", this.startLine);
+
     if (this.topLevel) {
       console.log("top level node - subnode count: ", this.contextNodes.length);
       this.contextNodes.forEach((node) => {
@@ -71,8 +73,12 @@ export class Context {
     }
 
     if (this.condition) {
-      console.log(this.condition.getText());
+      console.log("Condition: ", this.condition.getText());
     }
+
+    console.log("Vars: ", this.getVars());
+    console.log("Notes: ", this.getNotes());
+    console.log("Path: ", this.getPaths());
 
     if (this.trueChild) {
       this.trueChild.print();

@@ -71,6 +71,11 @@ export class ProgramAnalyzer {
         console.log("[ " + pathArr.join(", "), "]");
       });
 
+      console.log("=========");
+      // console.log("context: ", context);
+      context.print();
+      console.log("=========");
+
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
