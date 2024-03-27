@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { Condition } from "./Condition";
-import { Note } from "./Types";
+import { LineNumbers, Note } from "./Types";
 
 interface ContextConstructorInterface {
   context?: Context;
@@ -17,10 +17,7 @@ export class Context {
   private condition: ts.Expression;
   private notes: Note[];
   private contextNodes: Context[] = [];
-  private thenStartLine: number;
-  private thenEndLine: number;
-  private elseStartLine: number;
-  private elseEndLine: number;
+  private conditionLineNumbers: LineNumbers;
 
   constructor({ context, topLevel }: ContextConstructorInterface) {
     if (context) {
@@ -93,20 +90,12 @@ export class Context {
     this.condition = condition;
   };
 
-  setThenStartLine = (line: number) => {
-    this.thenStartLine = line;
+  setLineNumbers = (lineNumbers: LineNumbers) => {
+    this.conditionLineNumbers = lineNumbers;
   };
 
-  setThenEndLine = (line: number) => {
-    this.thenEndLine = line;
-  };
-
-  setElseStartLine = (line: number) => {
-    this.elseStartLine = line;
-  };
-
-  setElseEndLine = (line: number) => {
-    this.elseEndLine = line;
+  getLineNumbers = (): LineNumbers => {
+    return this.conditionLineNumbers;
   };
 
   getCondition = () => {

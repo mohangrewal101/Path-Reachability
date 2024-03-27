@@ -1,6 +1,7 @@
 
-import {Condition} from "./Condition";
-import {CheckSatResult, init} from 'z3-solver';
+import { CheckSatResult, init } from 'z3-solver';
+import { Condition } from "./Condition";
+import { CondLines } from './Types';
 
 export class ContextToZ3 {
 
@@ -10,11 +11,13 @@ export class ContextToZ3 {
         for(let path of paths) {
             let pathConditions = [];
             let pathParams: {[id: string]: any} = {};
-
+            let condArray: CondLines[] = [];
             path.forEach((condition) => {
                 let conditionString = condition.toString();
                 let paramKey = this.extractContent(conditionString);
                 let conditionVariableType = condition.vars[paramKey];
+                let startLine: number;
+                let endLine: number;
                 //TODO: Add more cases if necessary
                 switch (conditionVariableType) {
                     case 'boolean': {
@@ -22,19 +25,28 @@ export class ContextToZ3 {
                         if (!(paramKey in pathParams)) {
                             pathParams[paramKey] = Bool.const(paramKey);
                         }
-
+                        startLine = condition.lineNumbers.thenStartLine;
+                        endLine = condition.lineNumbers.thenEndLine;
                         if (conditionString.includes("!")) {
+                            startLine = condition.lineNumbers.elseStartLine;
+                            endLine = condition.lineNumbers.elseEndLine;
                             pathConditions.push(Not(pathParams[paramKey]));
                         } else {
                             pathConditions.push(pathParams[paramKey]);
                         }
                     }
                 }
+                condArray.push({conditionString, startLine, endLine});
             })
+
             const solver = new Solver();
             let combinedPath = And(...pathConditions);
 
-            console.log("[ " + pathConditions.join(", "), "]");
+            console.log("Path: [ " + pathConditions.join(", "), "]");
+            condArray.forEach((cond) => {
+                console.log("Condition: " + cond.conditionString + " Start: " + cond.startLine + " End: " + cond.endLine);
+            });
+            
             solver.add(combinedPath);
 
             const result: CheckSatResult = await solver.check();
@@ -43,6 +55,7 @@ export class ContextToZ3 {
                 console.log('Z3: Path is Satisfiable');
             } else if (result === 'unsat') {
                 //TODO: Add line number where code is not satisfiable
+
                 console.log('Z3: Path is Unsatisfiable');
             } else {
                 console.log('Z3: Unknown'); // The solver couldn't determine satisfiability
