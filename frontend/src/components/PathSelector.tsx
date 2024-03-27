@@ -43,6 +43,7 @@ export const PathSelector = ({ notes, onSelect }: PathSelectorProps) => {
         borderWidth: "1px",
         maxHeight: "500px",
         overflow: "hidden",
+        height: "100%",
       }}
     >
       <>
