@@ -4,15 +4,9 @@ interface CodeLineProps {
   code: string;
   lineNumber: number;
   highlighted: boolean;
-  onLineNumberClick: (number) => void;
 }
 
-export const CodeLine = ({
-  code,
-  lineNumber,
-  highlighted,
-  onLineNumberClick: handleLineNumberClick,
-}: CodeLineProps) => {
+export const CodeLine = ({ code, lineNumber, highlighted }: CodeLineProps) => {
   const [hovering, setHovering] = useState<boolean>(false);
 
   const handleOnMouseOver = () => {
@@ -28,7 +22,6 @@ export const CodeLine = ({
       <p
         onMouseOver={handleOnMouseOver}
         onMouseLeave={handleOnMouseLeave}
-        onClick={() => handleLineNumberClick(lineNumber)}
         style={{
           backgroundColor:
             highlighted && hovering

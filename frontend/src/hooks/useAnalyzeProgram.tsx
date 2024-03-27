@@ -1,14 +1,15 @@
 import { useState } from "react";
 
-export interface Note {
-  comment: string;
-  startLine: number;
-  endLine: number;
+export interface PathNote {
+  error?: boolean;
+  isSatisfiable?: boolean;
+  satisfyingAssignment?: { [key: string]: number | boolean };
+  lineNumbers?: number[];
 }
 
 export const useAnalyzeProgram = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<PathNote[]>([]);
 
   const analyzeProgram = (program: string) => {
     setLoading(true);
@@ -24,7 +25,7 @@ export const useAnalyzeProgram = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setNotes(data);
+        setNotes([...data]);
         setLoading(false);
       })
       .catch((err) => {

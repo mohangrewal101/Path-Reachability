@@ -1,6 +1,5 @@
 export interface Notes {
   pathNotes: PathNote[];
-  s;
 }
 
 export interface PathNote {
