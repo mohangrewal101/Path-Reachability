@@ -155,15 +155,21 @@ export class ProgramAnalyzer {
     currContext.setCondition(node.expression);
 
     // get start and end line numbers for if statement
-    const { startLine, endLine } = getLineNumbers(this.sourceFile, node);
-    console.log("start line: ", startLine, "end line: ", endLine);
-    currContext.setStartLine(startLine);
-    currContext.setEndLine(endLine);
+    const { thenStart, thenEnd, elseStart, elseEnd } = getLineNumbers(
+      this.sourceFile,
+      node
+    );
+
+    currContext.setThenStartLine(thenStart);
+    currContext.setThenEndLine(thenEnd);
+    currContext.setElseStartLine(elseStart);
+    currContext.setElseEndLine(elseEnd);
 
     this.visitNode(currContext, node.expression);
     this.visitNode(trueChild, node.thenStatement);
 
     if (node.elseStatement) {
+      console.log("hey");
       const falseChild = new Context({ context: currContext });
       currContext.setFalseChild(falseChild);
       this.visitNode(falseChild, node.elseStatement);
@@ -267,6 +273,7 @@ export class ProgramAnalyzer {
 
   visitBlock = (context: Context, node: ts.Block) => {
     log("Visiting block");
+
     node.getChildren().forEach((child) => {
       this.visitNode(context, child);
     });

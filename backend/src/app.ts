@@ -1,7 +1,9 @@
-import express from "express";
-import { init } from "z3-solver";
-import programAnalyzerRouter from "./routes/programAnalyzer.router";
 import cors from "cors";
+import express from "express";
+import ts from "typescript";
+import { init } from "z3-solver";
+import { ProgramAnalyzer } from "./classes/ProgramAnalyzer";
+import programAnalyzerRouter from "./routes/programAnalyzer.router";
 
 const app = express();
 const port = 3000;
@@ -31,3 +33,34 @@ const testZ3 = async () => {
   console.log(await solver.check());
   console.log("finished z3");
 };
+
+const testAnalyze = async () => {
+  const source = `
+    function test(a: number,b: number) {
+      const x = 1;
+      const y =2;
+      if (a > b) {
+        return 1;
+      } 
+      else {
+        return 2;
+      }
+    }
+    const w = 1;
+    const p = 2;
+    test(w,p);
+
+  `;
+
+  const sourceFile = ts.createSourceFile(
+    "file",
+    source,
+    ts.ScriptTarget.ES2020,
+    true
+  );
+
+  const programAnalyzer = new ProgramAnalyzer();
+  const analyzerNotes = await programAnalyzer.analyze(sourceFile);
+  return analyzerNotes;
+};
+testAnalyze();
