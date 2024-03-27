@@ -1,6 +1,5 @@
 import * as ts from "typescript";
 import { Condition } from "./Condition";
-import { Note } from "./Types";
 
 interface ContextConstructorInterface {
   context?: Context;
@@ -15,7 +14,6 @@ export class Context {
   private trueChild: Context;
   private falseChild: Context;
   private condition: ts.Expression;
-  private notes: Note[];
   private contextNodes: Context[] = [];
   private thenStartLine: number;
   private thenEndLine: number;
@@ -30,10 +28,6 @@ export class Context {
       this.topLevel = true;
     }
   }
-
-  getNotes = () => {
-    return this.notes;
-  };
 
   addVar = (name: string, type: string) => {
     this.vars[name] = type;
