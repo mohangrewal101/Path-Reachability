@@ -1,12 +1,16 @@
 import { CheckSatResult, init } from "z3-solver";
 import { Condition } from "./Condition";
 import { CondLines } from "./Types";
+import { PathNote } from "./Types";
+import { removeAllListeners } from "process";
 
 export class ContextToZ3 {
-  async checkPaths(paths: Condition[][]) {
+  async checkPaths(paths: Condition[][]): Promise<PathNote[]> {
     const { Context } = await init();
     const { Solver, Bool, Not, And, Int, LT, GE, GT, LE, Eq } = Context("main");
+    const notes: PathNote[] = [];
     for (let path of paths) {
+      const pathNote: PathNote = {};
       let pathConditions = [];
       let pathParams: { [id: string]: any } = {};
       let satisfyingAssignment: { [id: string]: any } = {};
@@ -17,14 +21,26 @@ export class ContextToZ3 {
         let extractedContent = this.extractContent(conditionString);
         let startLine: number;
         let endLine: number;
+        let startLineRemoval: number;
+        let endLineRemoval: number;
         if (conditionString.includes("!")) {
           startLine = condition.lineNumbers.elseStartLine;
           endLine = condition.lineNumbers.elseEndLine;
+          startLineRemoval = condition.lineNumbers.thenStartLine;
+          endLineRemoval = condition.lineNumbers.thenEndLine;
         } else {
           startLine = condition.lineNumbers.thenStartLine;
-          endLine = condition.lineNumbers.thenEndLine;  
+          endLine = condition.lineNumbers.thenEndLine;
+          startLineRemoval = condition.lineNumbers.elseStartLine;
+          endLineRemoval = condition.lineNumbers.elseEndLine;
         }
-        condArray.push({conditionString, startLine, endLine});
+        condArray.push({
+          conditionString,
+          startLine,
+          endLine,
+          startLineRemoval,
+          endLineRemoval,
+        });
         for (let paramKey of extractedContent) {
           let conditionVariableType = condition.vars[paramKey];
           switch (conditionVariableType) {
@@ -111,6 +127,7 @@ export class ContextToZ3 {
       let combinedPath = And(...pathConditions);
 
       console.log("Path: [ " + pathConditions.join(", "), "]");
+      const condLineNumbers: number[][] = [];
       condArray.forEach((cond) => {
         console.log(
           "Condition: " +
@@ -120,6 +137,12 @@ export class ContextToZ3 {
             " End: " +
             cond.endLine
         );
+        condLineNumbers.push([
+          cond.startLine,
+          cond.endLine,
+          cond.startLineRemoval,
+          cond.endLineRemoval,
+        ]);
       });
 
       solver.add(combinedPath);
@@ -134,12 +157,19 @@ export class ContextToZ3 {
         console.log(
           "Z3 Satisfying Assignment: [ " + satisfyingAssignmentOutput + " ]"
         );
+        pathNote.isSatisfiable = true;
+        pathNote.satisfyingAssignment = { ...satisfyingAssignment };
+        pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
+        pathNote.isSatisfiable = false;
       } else {
         console.log("Z3: Unknown"); // The solver couldn't determine satisfiability
+        pathNote.error = true;
       }
+      notes.push(pathNote);
     }
+    return notes;
   }
 
   // Used ChatGPT to get a method to extract content from brackets.
@@ -164,4 +194,27 @@ export class ContextToZ3 {
     }
     return [];
   }
+
+  getAllLineNumbers = (condLineNumbers: number[][]): number[] => {
+    const avoidLineNumbers: number[] = [];
+    const allLineNumbers: number[] = [];
+
+    condLineNumbers.forEach((set: number[]) => {
+      for (let i: number = set[2]; i <= set[3]; i++) {
+        avoidLineNumbers.push(i);
+      }
+    });
+
+    condLineNumbers.forEach((set: number[]) => {
+      console.log("set: ", set);
+      for (let i: number = set[0]; i <= set[1]; i++) {
+        console.log("pushing: ", i);
+        if (!avoidLineNumbers.includes(i)) {
+          allLineNumbers.push(i);
+        }
+      }
+    });
+
+    return allLineNumbers;
+  };
 }

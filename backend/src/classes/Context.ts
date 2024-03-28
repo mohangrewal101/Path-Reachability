@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { Condition } from "./Condition";
-import { LineNumbers, Note } from "./Types";
+import { LineNumbers } from "./Types";
 
 interface ContextConstructorInterface {
   context?: Context;
@@ -15,7 +15,6 @@ export class Context {
   private trueChild: Context;
   private falseChild: Context;
   private condition: ts.Expression;
-  private notes: Note[];
   private contextNodes: Context[] = [];
   private conditionLineNumbers: LineNumbers;
 
@@ -27,10 +26,6 @@ export class Context {
       this.topLevel = true;
     }
   }
-
-  getNotes = () => {
-    return this.notes;
-  };
 
   addVar = (name: string, type: string) => {
     this.vars[name] = type;
