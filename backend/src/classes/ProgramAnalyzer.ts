@@ -2,7 +2,7 @@ import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
 import { ContextToZ3 } from "./ContextToZ3";
-import { Note } from "./Types";
+import { LineNumbers, Note } from "./Types";
 import { getLineNumbers } from "./utils/utils";
 
 const LOGGING = true;
@@ -150,21 +150,17 @@ export class ProgramAnalyzer {
     currContext.setCondition(node.expression);
 
     // get start and end line numbers for if statement
-    const { thenStart, thenEnd, elseStart, elseEnd } = getLineNumbers(
+    const conditionLineNumbers: LineNumbers = getLineNumbers(
       this.sourceFile,
       node
     );
 
-    currContext.setThenStartLine(thenStart);
-    currContext.setThenEndLine(thenEnd);
-    currContext.setElseStartLine(elseStart);
-    currContext.setElseEndLine(elseEnd);
+    currContext.setLineNumbers(conditionLineNumbers);
 
     this.visitNode(currContext, node.expression);
     this.visitNode(trueChild, node.thenStatement);
 
     if (node.elseStatement) {
-      console.log("hey");
       const falseChild = new Context({ context: currContext });
       currContext.setFalseChild(falseChild);
       this.visitNode(falseChild, node.elseStatement);
