@@ -36,20 +36,29 @@ const testZ3 = async () => {
 
 const testAnalyze = async () => {
   const source = `
-    function test(a: number,b: number) {
-      const x = 1;
-      const y =2;
-      if (a > b) {
-        return 1;
-      } 
-      else {
-        return 2;
+  function example(a: boolean, b: boolean, c: boolean) {
+    if (a) {
+      // do something
+    } else {
+      // do something else
+    }
+  
+    if (b) {
+      // do something
+      if (c) {
+        // do something
+      } else {
+        // do something else
+      }
+    } else {
+      if (a) {
+        // do something
+      } else {
+        // do something else
       }
     }
-    const w = 1;
-    const p = 2;
-    test(w,p);
-
+  }
+  
   `;
 
   const sourceFile = ts.createSourceFile(

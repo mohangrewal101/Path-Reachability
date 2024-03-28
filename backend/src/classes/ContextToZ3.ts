@@ -1,21 +1,33 @@
-import { Condition } from "./Condition";
 import { CheckSatResult, init } from "z3-solver";
+import { Condition } from "./Condition";
+import { CondLines } from "./Types";
 import { PathNote } from "./Types";
 
 export class ContextToZ3 {
   async checkPaths(paths: Condition[][]): Promise<PathNote[]> {
-    const notes: PathNote[] = [];
     const { Context } = await init();
     const { Solver, Bool, Not, And, Int, LT, GE, GT, LE, Eq } = Context("main");
+    const notes: PathNote[] = [];
     for (let path of paths) {
       const pathNote: PathNote = {};
       let pathConditions = [];
       let pathParams: { [id: string]: any } = {};
       let satisfyingAssignment: { [id: string]: any } = {};
+      let condArray: CondLines[] = [];
 
       path.forEach((condition) => {
         let conditionString = condition.toString();
         let extractedContent = this.extractContent(conditionString);
+        let startLine: number;
+        let endLine: number;
+        if (conditionString.includes("!")) {
+          startLine = condition.lineNumbers.elseStartLine;
+          endLine = condition.lineNumbers.elseEndLine;
+        } else {
+          startLine = condition.lineNumbers.thenStartLine;
+          endLine = condition.lineNumbers.thenEndLine;
+        }
+        condArray.push({ conditionString, startLine, endLine });
         for (let paramKey of extractedContent) {
           let conditionVariableType = condition.vars[paramKey];
           switch (conditionVariableType) {
@@ -97,10 +109,22 @@ export class ContextToZ3 {
 
         pathConditions.push(conditionValue);
       });
+
       const solver = new Solver();
       let combinedPath = And(...pathConditions);
 
-      console.log("[ " + pathConditions.join(", "), "]");
+      console.log("Path: [ " + pathConditions.join(", "), "]");
+      condArray.forEach((cond) => {
+        console.log(
+          "Condition: " +
+            cond.conditionString +
+            " Start: " +
+            cond.startLine +
+            " End: " +
+            cond.endLine
+        );
+      });
+
       solver.add(combinedPath);
 
       const result: CheckSatResult = await solver.check();
