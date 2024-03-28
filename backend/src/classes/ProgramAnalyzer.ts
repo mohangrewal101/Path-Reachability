@@ -54,6 +54,11 @@ export class ProgramAnalyzer {
     };
   }
 
+  // setter for this.sourceFile used for testing
+  setSourceFile(sourceFile: ts.SourceFile) {
+    this.sourceFile = sourceFile;
+  }
+
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<Note[]>((resolve, reject) => {
