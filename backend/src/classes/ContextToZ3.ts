@@ -21,14 +21,26 @@ export class ContextToZ3 {
         let extractedContent = this.extractContent(conditionString);
         let startLine: number;
         let endLine: number;
+        let startLineRemoval: number;
+        let endLineRemoval: number;
         if (conditionString.includes("!")) {
           startLine = condition.lineNumbers.elseStartLine;
           endLine = condition.lineNumbers.elseEndLine;
+          startLineRemoval = condition.lineNumbers.thenStartLine;
+          endLineRemoval = condition.lineNumbers.thenEndLine;
         } else {
           startLine = condition.lineNumbers.thenStartLine;
           endLine = condition.lineNumbers.thenEndLine;
+          startLineRemoval = condition.lineNumbers.elseStartLine;
+          endLineRemoval = condition.lineNumbers.elseEndLine;
         }
-        condArray.push({ conditionString, startLine, endLine });
+        condArray.push({
+          conditionString,
+          startLine,
+          endLine,
+          startLineRemoval,
+          endLineRemoval,
+        });
         for (let paramKey of extractedContent) {
           let conditionVariableType = condition.vars[paramKey];
           switch (conditionVariableType) {
@@ -125,7 +137,12 @@ export class ContextToZ3 {
             " End: " +
             cond.endLine
         );
-        condLineNumbers.push([cond.startLine, cond.endLine]);
+        condLineNumbers.push([
+          cond.startLine,
+          cond.endLine,
+          cond.startLineRemoval,
+          cond.endLineRemoval,
+        ]);
       });
 
       solver.add(combinedPath);
@@ -179,13 +196,22 @@ export class ContextToZ3 {
   }
 
   getAllLineNumbers = (condLineNumbers: number[][]): number[] => {
+    const avoidLineNumbers: number[] = [];
     const allLineNumbers: number[] = [];
+
+    condLineNumbers.forEach((set: number[]) => {
+      for (let i: number = set[2]; i <= set[3]; i++) {
+        avoidLineNumbers.push(i);
+      }
+    });
 
     condLineNumbers.forEach((set: number[]) => {
       console.log("set: ", set);
       for (let i: number = set[0]; i <= set[1]; i++) {
         console.log("pushing: ", i);
-        allLineNumbers.push(i);
+        if (!avoidLineNumbers.includes(i)) {
+          allLineNumbers.push(i);
+        }
       }
     });
 

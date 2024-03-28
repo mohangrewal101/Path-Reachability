@@ -20,4 +20,6 @@ export interface CondLines {
   conditionString: string;
   startLine: number;
   endLine: number;
+  startLineRemoval: number;
+  endLineRemoval: number;
 }
