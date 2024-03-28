@@ -13,7 +13,7 @@ function example3(a: number, b: number, c: number) {
       // do something else
     }
   } else {
-    if (a < c) {
+    if (a <= c) {
       // do something
     } else {
       // do something else
