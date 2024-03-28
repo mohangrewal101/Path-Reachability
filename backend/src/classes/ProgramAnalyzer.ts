@@ -2,8 +2,9 @@ import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
 import { Context } from "./Context";
 import { ContextToZ3 } from "./ContextToZ3";
-import { Note } from "./Types";
+import { LineNumbers } from "./Types";
 import { getLineNumbers } from "./utils/utils";
+import { PathNote } from "./Types";
 
 const LOGGING = true;
 const WARNING = true;
@@ -61,7 +62,7 @@ export class ProgramAnalyzer {
 
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
-    return new Promise<Note[]>((resolve, reject) => {
+    return new Promise<PathNote[]>((resolve, reject) => {
       const context = new Context({ topLevel: true });
       this.visitNode(context, sourceFile);
       console.log("=========");
@@ -85,8 +86,8 @@ export class ProgramAnalyzer {
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
         .checkPaths(context.getPaths())
-        .then(() => {
-          resolve(context.getNotes());
+        .then((notes) => {
+          resolve(notes);
         })
         .catch((error) => {
           console.error("Error during analysis: ", error);
@@ -160,21 +161,17 @@ export class ProgramAnalyzer {
     currContext.setCondition(node.expression);
 
     // get start and end line numbers for if statement
-    const { thenStart, thenEnd, elseStart, elseEnd } = getLineNumbers(
+    const conditionLineNumbers: LineNumbers = getLineNumbers(
       this.sourceFile,
       node
     );
 
-    currContext.setThenStartLine(thenStart);
-    currContext.setThenEndLine(thenEnd);
-    currContext.setElseStartLine(elseStart);
-    currContext.setElseEndLine(elseEnd);
+    currContext.setLineNumbers(conditionLineNumbers);
 
     this.visitNode(currContext, node.expression);
     this.visitNode(trueChild, node.thenStatement);
 
     if (node.elseStatement) {
-      console.log("hey");
       const falseChild = new Context({ context: currContext });
       currContext.setFalseChild(falseChild);
       this.visitNode(falseChild, node.elseStatement);

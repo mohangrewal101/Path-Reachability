@@ -1,33 +1,35 @@
 import ts from "typescript";
+import { LineNumbers } from "../Types";
 
 export const getLineNumbers = (
   sourceFile: ts.SourceFile,
   node: ts.IfStatement
-): {
-  thenStart: number;
-  thenEnd: number;
-  elseStart: number;
-  elseEnd: number;
-} => {
+): LineNumbers => {
   const getLineNumber = (pos?: number) =>
     pos !== undefined
       ? sourceFile.getLineAndCharacterOfPosition(pos).line
       : undefined;
 
-  const thenStart = getLineNumber(node.thenStatement.getStart());
-  const thenEnd = getLineNumber(node.thenStatement.getEnd());
-  const elseStart = getLineNumber(node.elseStatement?.getStart());
-  const elseEnd = getLineNumber(node.elseStatement?.getEnd());
+  const thenStartLine = getLineNumber(node.thenStatement.getStart());
+  const thenEndLine = getLineNumber(node.thenStatement.getEnd());
+  const elseStartLine = getLineNumber(node.elseStatement?.getStart());
+  const elseEndLine = getLineNumber(node.elseStatement?.getEnd());
   console.log(
     "thenStart: ",
-    thenStart,
+    thenStartLine,
     "thenEnd: ",
-    thenEnd,
+    thenEndLine,
     "elseStart: ",
-    elseStart,
+    elseStartLine,
     "elseEnd: ",
-    elseEnd
+    elseEndLine
   );
+  const lineNumbers: LineNumbers = {
+    thenStartLine,
+    thenEndLine,
+    elseStartLine,
+    elseEndLine,
+  };
 
-  return { thenStart, thenEnd, elseStart, elseEnd };
+  return lineNumbers;
 };

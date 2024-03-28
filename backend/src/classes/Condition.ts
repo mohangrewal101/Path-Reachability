@@ -1,5 +1,6 @@
-import { Context } from "./Context";
 import * as ts from "typescript";
+import { Context } from "./Context";
+import { LineNumbers } from "./Types";
 
 interface ConditionConstructorInterface {
   context: Context;
@@ -10,11 +11,13 @@ export class Condition {
   vars: { [key: string]: string } = {};
   condition: ts.Expression;
   negated: boolean;
+  lineNumbers: LineNumbers;
 
   constructor({ context, negated }: ConditionConstructorInterface) {
     this.vars = { ...context.getVars() };
     this.condition = context.getCondition();
     this.negated = negated;
+    this.lineNumbers = context.getLineNumbers();
   }
 
   toString = (): string => {
