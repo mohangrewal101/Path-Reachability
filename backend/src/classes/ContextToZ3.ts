@@ -163,6 +163,7 @@ export class ContextToZ3 {
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
         pathNote.isSatisfiable = false;
+        pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else {
         console.log("Z3: Unknown"); // The solver couldn't determine satisfiability
         pathNote.error = true;
@@ -206,9 +207,7 @@ export class ContextToZ3 {
     });
 
     condLineNumbers.forEach((set: number[]) => {
-      console.log("set: ", set);
       for (let i: number = set[0]; i <= set[1]; i++) {
-        console.log("pushing: ", i);
         if (!avoidLineNumbers.includes(i)) {
           allLineNumbers.push(i);
         }

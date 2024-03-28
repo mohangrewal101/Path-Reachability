@@ -21,7 +21,9 @@ const PathSelectorItem = ({ idx, note, onClick }: PathSelectorItemProps) => {
         cursor: "pointer",
       }}
     >
-      <p>{idx}</p>
+      <p style={{ color: note.isSatisfiable === true ? "green" : "red" }}>
+        {idx}
+      </p>
     </div>
   );
 };
