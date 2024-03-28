@@ -32,7 +32,8 @@ interface PathSelectorProps {
 }
 
 export const PathSelector = ({ notes, onSelect }: PathSelectorProps) => {
-  const handlePathClick = (note) => {
+  const handlePathClick = (note: PathNote) => {
+    console.log("clicking: ", note);
     onSelect(note);
   };
   return (

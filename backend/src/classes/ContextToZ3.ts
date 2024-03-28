@@ -2,6 +2,7 @@ import { CheckSatResult, init } from "z3-solver";
 import { Condition } from "./Condition";
 import { CondLines } from "./Types";
 import { PathNote } from "./Types";
+import { removeAllListeners } from "process";
 
 export class ContextToZ3 {
   async checkPaths(paths: Condition[][]): Promise<PathNote[]> {
@@ -114,6 +115,7 @@ export class ContextToZ3 {
       let combinedPath = And(...pathConditions);
 
       console.log("Path: [ " + pathConditions.join(", "), "]");
+      const condLineNumbers: number[][] = [];
       condArray.forEach((cond) => {
         console.log(
           "Condition: " +
@@ -123,6 +125,7 @@ export class ContextToZ3 {
             " End: " +
             cond.endLine
         );
+        condLineNumbers.push([cond.startLine, cond.endLine]);
       });
 
       solver.add(combinedPath);
@@ -139,6 +142,7 @@ export class ContextToZ3 {
         );
         pathNote.isSatisfiable = true;
         pathNote.satisfyingAssignment = { ...satisfyingAssignment };
+        pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
         pathNote.isSatisfiable = false;
@@ -173,4 +177,18 @@ export class ContextToZ3 {
     }
     return [];
   }
+
+  getAllLineNumbers = (condLineNumbers: number[][]): number[] => {
+    const allLineNumbers: number[] = [];
+
+    condLineNumbers.forEach((set: number[]) => {
+      console.log("set: ", set);
+      for (let i: number = set[0]; i <= set[1]; i++) {
+        console.log("pushing: ", i);
+        allLineNumbers.push(i);
+      }
+    });
+
+    return allLineNumbers;
+  };
 }

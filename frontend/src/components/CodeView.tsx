@@ -27,7 +27,8 @@ export const CodeView = ({ fileContents, note }: CodeViewProps) => {
         {fileSplit.map((line, index) => {
           let highlighted = false;
 
-          if (note.lineNumbers && index in note.lineNumbers) highlighted = true;
+          if (note.lineNumbers && note.lineNumbers.includes(index))
+            highlighted = true;
 
           return (
             <CodeLine
