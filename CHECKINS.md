@@ -175,11 +175,11 @@ This timeline will give the team a full week to do extensive integration testing
 
 ### User Study 2 - User 1
 
-- User 1 presented with an example program, asked to upload to the front end of the application
+- User 1 presented with an example program, and asked to upload it to the front end of the application.
 - The user thought the application was interesting.
-- The user did not understand why the “unsatisfiable” paths would be useful to know about. Said we should consider removing these.
-- The user thought it would be great if the program could generate the test case templates, since it is already outputting the variable assignments for satisfiable paths through the program.
-- The user mentioned it would be beneficial if the application analysis was able to handle more complex conditions (like operators on numerical values, and variable assignments). The team is actively working on these features already.
+- They did not understand why the “unsatisfiable” paths would be useful to know about. They said we should consider removing these.
+- They thought it would be great if the program could generate the test case templates, since it is already outputting the variable assignments for satisfiable paths through the program.
+- They mentioned it would be beneficial if the application analysis was able to handle more complex conditions (like operators on numerical values, and variable assignments). The team is actively working on these features already.
 
 ### User Study 2 - User 2
 
@@ -188,6 +188,14 @@ This timeline will give the team a full week to do extensive integration testing
 - User suggested we make it more clear what parameters values are used for each path - maybe making the satisfying assignment on the right more clear.
 - Many of the sample programs were crashing, so the user was not able to write a script that worked for the analyzer. We just explored the analyzer using test cases provided in the repo
 - The program still needs more flexibility and error handling to prevent it from crashing when it encounters programs it can’t analyse.
+
+### Changes Planned
+
+- After completing and reviewing the feedback from the user study, it was decided that the team will make the following changes:
+  - Introduce additional error handling in the application.
+  - Clean up the UI panel with the satisfying assignments for given paths through the programs.
+  - Provide some instructions and overview on what the user is actually looking at. This should help clear up some confusion about what the highlighted lines mean.
+  - Hide or remove the unsatisfiable paths from the UI, since both users mentioned this informaition may not be particularly useful.
 
 ## Plans for final video (possible draft version).
 
