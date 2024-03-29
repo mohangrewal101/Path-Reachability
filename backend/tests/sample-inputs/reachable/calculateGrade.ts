@@ -1,24 +1,24 @@
-function calculateGrade(score, total, cheated) {
-    let percentage = (score / total) * 100;
-    let grade = "";
+function calculateGrade(score: number, total: number, cheated: boolean) {
+  let percentage: number = (score / total) * 100;
+  let grade: string = "";
 
-    if (percentage >= 90) {
-        grade = "A";
-    } else if (percentage >= 80 && percentage < 90) {
-        grade = "B";
-    } else if (percentage >= 70 && percentage < 80) {
-        grade = "C";
-    } else if (percentage >= 50 && percentage < 70) {
-        grade = "D";
-    } else {
-        grade = "F"
-    }
+  if (percentage >= 90) {
+    grade = "A";
+  } else if (percentage >= 80 && percentage < 90) {
+    grade = "B";
+  } else if (percentage >= 70 && percentage < 80) {
+    grade = "C";
+  } else if (percentage >= 50 && percentage < 70) {
+    grade = "D";
+  } else {
+    grade = "F";
+  }
 
-    if(cheated) {
-        grade = "F"
-    }
+  if (cheated) {
+    grade = "F";
+  }
 
-    return grade;
+  return grade;
 }
 
 /**
@@ -33,10 +33,10 @@ function calculateGrade(score, total, cheated) {
  * h) 1, 2, 3, 5, 7, 9, 11, 12, 17, 18, 21
  * i) 1, 2, 3, 5, 7, 9, 11, 14, 17, 21
  * j) 1, 2, 3, 5, 7, 9, 11, 14, 17, 18, 21
- * 
+ *
  * Unreachable Execution Paths:
  * All paths are reachable!
- * 
+ *
  * Parameters required for 100% test coverage of reachable paths:
  * a)   score=90
  *      total=100
