@@ -168,3 +168,62 @@ This analysis will return a list of possible paths, indicate which of these path
 Since the MVP will be completed relatively early, the team will then focus on expanding the scope of the analysis to include programs with numeric parameters, and expanding the complexity of the conditional statements that can be analyzed.
 These are fairly small extensions to the capabilities of the MVP, so it is still expected the team will be able to meet this milestone by March 31.
 This timeline will give the team a full week to do extensive integration testing and documentation before producing the final video for submission.
+
+# Check-In 5 - March 29, 2024
+
+## Status of final user study; any feedback and changes planned.
+
+### User Study 2 - User 1
+
+- User 1 presented with an example program, and asked to upload it to the front end of the application.
+- The user thought the application was interesting.
+- They did not understand why the “unsatisfiable” paths would be useful to know about. They said we should consider removing these.
+- They thought it would be great if the program could generate the test case templates, since it is already outputting the variable assignments for satisfiable paths through the program.
+- They mentioned it would be beneficial if the application analysis was able to handle more complex conditions (like operators on numerical values, and variable assignments). The team is actively working on these features already.
+
+### User Study 2 - User 2
+
+- After doing a tour of the UI and seeing an example of how the program works, the user was unsure how useful this would be for their work. They did mention it might be useful for some machine learning applications that have a lot of conditional statements.
+- User did like how the UI showed every execution path in the script, but was confused by the paths marked in red. I had to explain to him that those are not necessarily unreachable code, but rather that they are paths that have some kind of contradiction in the parameters used by Z3 (ie. a == !a). He suggested we exclude those from the UI and instead just mark in actual unreachable code.
+- User suggested we make it more clear what parameters values are used for each path - maybe making the satisfying assignment on the right more clear.
+- Many of the sample programs were crashing, so the user was not able to write a script that worked for the analyzer. We just explored the analyzer using test cases provided in the repo
+- The program still needs more flexibility and error handling to prevent it from crashing when it encounters programs it can’t analyse.
+
+### Changes Planned
+
+- After completing and reviewing the feedback from the user study, it was decided that the team will make the following changes:
+  - Introduce additional error handling in the application.
+  - Clean up the UI panel with the satisfying assignments for given paths through the programs.
+  - Provide some instructions and overview on what the user is actually looking at. This should help clear up some confusion about what the highlighted lines mean.
+  - Hide or remove the unsatisfiable paths from the UI, since both users mentioned this informaition may not be particularly useful.
+
+## Plans for final video (possible draft version).
+
+- The video will begin with a brief overview of the application and analysis that was built out.
+- This will be followed with an overview of the process followed, and the results of the two user studies that were conducted. This part will highlight which feedback for improvement was given, and which feedback was actually implemented.
+- Finally, a quick demonstration will be presented wherein a sample program is uploaded to the application. A few sample paths will be selected for review, and the video presenter will walk through the execution path and explain what would be happening to validate the execution path presented by the analysis is correct.
+
+## Planned timeline for the remaining days.
+
+- The MVP is currently working (for simple programs with boolean conditions, boolean program arguments, and no variable reassignments).
+- The remaining items are to finish up the MVP extensions (numerical conditions, numerical program arguments, with variable declarations and reassignments).
+- Once the last of the features are built out, the video will be recorded and submitted.
+
+| Item                                   | Responsible Individual(s) | Start Date | Expected / Actual Completion Date |
+| -------------------------------------- | ------------------------- | ---------- | --------------------------------- |
+| MVP Completed                          | Everyone                  |            | March 27                          |
+| AST Traversal - Stretch Goals          | Will                      | March 26   | March 31                          |
+| Context Transformation - Stretch Goals | Mohan                     | March 26   | March 31                          |
+| Testing - AST Traversal                | Rodrigo                   | March 10   | March 31                          |
+| Testing - Context Transformation       | Kenny                     | March 10   | March 31                          |
+| Stretch Goals Completed                | Everyone                  |            | March 31                          |
+| Integration Testing                    | Everyone                  | April 1    | April 4                           |
+| Demo Creation                          | Rodrigo                   | April 3    | April 4                           |
+| Video Production                       | Alex, Kenny               | April 5    | April 6                           |
+| Project Submission                     | Everyone                  |            | April 7                           |
+
+## Progress against the timeline planned for your team, including the specific goals you defined (originally as part of Check-in 2) for Check-in 5.
+
+- The progress is lining up fairly well with the planned timeline for the team. The MVP was finished one day after the original plan. The team still considered that to be a success!
+- Progress is going well for the remaining items. The team is working on getting numerical values and conditions to work with the analysis, and to build it out further to handle simple variable assignments and reassignments.
+- We are still targeting March 31 to complete these remaining items. This will give us a large buffer to complete sufficient testing and record the video.
