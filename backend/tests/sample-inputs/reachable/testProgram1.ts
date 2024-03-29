@@ -1,4 +1,4 @@
-function example(a: boolean, b: boolean, c: boolean) {
+function testProgram1(a: boolean, b: boolean, c: boolean) {
   if (a) {
     // do something
   } else {

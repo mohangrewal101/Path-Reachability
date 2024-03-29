@@ -65,7 +65,7 @@ export class Context {
     }
 
     if (this.condition) {
-      console.log(this.condition.getText());
+      console.log("Condition: ", this.condition.getText());
     }
 
     if (this.trueChild) {

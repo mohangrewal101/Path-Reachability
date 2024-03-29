@@ -55,6 +55,11 @@ export class ProgramAnalyzer {
     };
   }
 
+  // setter for this.sourceFile used for testing
+  setSourceFile(sourceFile: ts.SourceFile) {
+    this.sourceFile = sourceFile;
+  }
+
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<PathNote[]>((resolve, reject) => {
@@ -71,6 +76,11 @@ export class ProgramAnalyzer {
         });
         console.log("[ " + pathArr.join(", "), "]");
       });
+
+      console.log("=========");
+      // console.log("context: ", context);
+      context.print();
+      console.log("=========");
 
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
