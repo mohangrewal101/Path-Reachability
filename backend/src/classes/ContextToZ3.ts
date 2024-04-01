@@ -1,5 +1,5 @@
 import { CheckSatResult, init } from "z3-solver";
-import { Condition } from "./Condition";
+import { Condition } from "./ProgramStatements/Condition";
 import { CondLines } from "./Types";
 import { PathNote } from "./Types";
 import { removeAllListeners } from "process";

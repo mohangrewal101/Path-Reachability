@@ -1,10 +1,16 @@
 import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
-import { Context } from "./Context";
+import { Context } from "./Contexts/Context";
+import { ContextConditional } from "./Contexts/ContextConditional";
 import { ContextToZ3 } from "./ContextToZ3";
 import { LineNumbers } from "./Types";
 import { getLineNumbers } from "./utils/utils";
 import { PathNote } from "./Types";
+import {
+  ContextPathsEvaluator,
+  ContextPathsVisitorContext,
+} from "./Evaluators/ContextEvaluator";
+import { ProgramStatementProcessor } from "./ProgramStatements/ProgramStatementProcessor";
 
 const LOGGING = true;
 const WARNING = true;
@@ -63,12 +69,23 @@ export class ProgramAnalyzer {
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<PathNote[]>((resolve, reject) => {
-      const context = new Context({ topLevel: true });
+      const context = new Context({});
       this.visitNode(context, sourceFile);
       console.log("=========");
       console.log("GETTING PATHS");
       console.log("=========");
-      context.getPaths().forEach((path) => {
+      const contextEvaluator = new ContextPathsEvaluator();
+      const visitorContext = new ContextPathsVisitorContext();
+      contextEvaluator.visit(visitorContext, context);
+
+      const programStatementLists = visitorContext.getChildPaths();
+      const programStatementProcessor = new ProgramStatementProcessor();
+      const conditionLists =
+        programStatementProcessor.processProgramStatementLists(
+          programStatementLists
+        );
+
+      conditionLists.forEach((path) => {
         let pathArr = [];
         path.forEach((condition) => {
           pathArr.push(condition.toString());
@@ -77,15 +94,10 @@ export class ProgramAnalyzer {
         console.log("[ " + pathArr.join(", "), "]");
       });
 
-      console.log("=========");
-      // console.log("context: ", context);
-      context.print();
-      console.log("=========");
-
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
-        .checkPaths(context.getPaths())
+        .checkPaths(conditionLists)
         .then((notes) => {
           resolve(notes);
         })
@@ -148,17 +160,8 @@ export class ProgramAnalyzer {
   visitIfStatement = (context: Context, node: ts.IfStatement) => {
     log("found an if statement");
 
-    let currContext: Context;
-    if (context.isTopLevel()) {
-      currContext = new Context({ context });
-      context.addTopLevelNode(currContext);
-    } else {
-      currContext = context;
-    }
-
-    const trueChild = new Context({ context: currContext });
-    currContext.setTrueChild(trueChild);
-    currContext.setCondition(node.expression);
+    let currContext: ContextConditional = new ContextConditional({ context });
+    context.addChild(currContext);
 
     // get start and end line numbers for if statement
     const conditionLineNumbers: LineNumbers = getLineNumbers(
@@ -167,14 +170,14 @@ export class ProgramAnalyzer {
     );
 
     currContext.setLineNumbers(conditionLineNumbers);
-
+    currContext.setCondition(node.expression);
+    currContext.setVisitingTrue();
     this.visitNode(currContext, node.expression);
-    this.visitNode(trueChild, node.thenStatement);
+    this.visitNode(currContext, node.thenStatement);
 
     if (node.elseStatement) {
-      const falseChild = new Context({ context: currContext });
-      currContext.setFalseChild(falseChild);
-      this.visitNode(falseChild, node.elseStatement);
+      currContext.setVisitingFalse();
+      this.visitNode(currContext, node.elseStatement);
     }
   };
 
