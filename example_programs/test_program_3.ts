@@ -7,7 +7,7 @@ function example3(a: number, b: number, c: number) {
 
   if (b < a) {
     // do something
-    if (c === b) {
+    if (c == b) {
       // do something
     } else {
       // do something else
