@@ -36,7 +36,7 @@ export declare type CoercibleToMap<T extends AnyExpr<Name>, Name extends string 
  * x.asNumber()
  * // 0.3333333333333333
  * ```
- * @see {@link Context.from}
+ * @see {@link CustomContext.from}
  * @category Global
  */
 export declare class Z3Error extends Error {
@@ -53,10 +53,10 @@ export interface Context<Name extends string = 'main'> {
     /** @hidden */
     readonly ptr: Z3_context;
     /**
-     * Name of the current Context
+     * Name of the current CustomContext
      *
      * ```typescript
-     * const c = new Context('main')
+     * const c = new CustomContext('main')
      *
      * c.name
      * // 'main'
@@ -1179,7 +1179,7 @@ export interface Z3HighLevel {
     getParam(name: string): string | null;
     /**
      * Use this to create new contexts
-     * @see {@link Context}
+     * @see {@link CustomContext}
      */
     readonly Context: ContextCtor;
 }

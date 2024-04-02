@@ -97,7 +97,7 @@ export class ProgramAnalyzer {
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
-        .checkPaths(conditionLists)
+        .checkPaths(context, conditionLists)
         .then((notes) => {
           resolve(notes);
         })
@@ -159,6 +159,7 @@ export class ProgramAnalyzer {
 
   visitIfStatement = (context: Context, node: ts.IfStatement) => {
     log("found an if statement");
+
 
     let currContext: ContextConditional = new ContextConditional({ context });
     context.addChild(currContext);

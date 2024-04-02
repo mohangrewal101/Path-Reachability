@@ -27,8 +27,8 @@ __exportStar(require("./low-level/types.__GENERATED__"), exports);
  * ```typescript
  * import { init, sat } from 'z3-solver';
  *
- * const { Context } = await init();
- * const { Solver, Int } = new Context('main');
+ * const { CustomContext } = await init();
+ * const { Solver, Int } = new CustomContext('main');
  *
  * const x = Int.const('x');
  * const y = Int.const('y');

@@ -16,7 +16,7 @@ exports.Z3AssertionError = exports.Z3Error = void 0;
  * x.asNumber()
  * // 0.3333333333333333
  * ```
- * @see {@link Context.from}
+ * @see {@link CustomContext.from}
  * @category Global
  */
 class Z3Error extends Error {

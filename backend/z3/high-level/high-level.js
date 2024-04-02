@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createApi = void 0;
-// TODO(ritave): Add typing for Context Options
+// TODO(ritave): Add typing for CustomContext Options
 //               https://github.com/Z3Prover/z3/pull/6048#discussion_r883391669
 // TODO(ritave): Add an error handler
 // TODO(ritave): Add support for building faster floats without support for Safari
@@ -80,7 +80,7 @@ function createApi(Z3) {
         Z3.set_ast_print_mode(contextPtr, low_level_1.Z3_ast_print_mode.Z3_PRINT_SMTLIB2_COMPLIANT);
         Z3.del_config(cfg);
         function _assertContext(...ctxs) {
-            ctxs.forEach(other => (0, utils_1.assert)('ctx' in other ? ctx === other.ctx : ctx === other, 'Context mismatch'));
+            ctxs.forEach(other => (0, utils_1.assert)('ctx' in other ? ctx === other.ctx : ctx === other, 'CustomContext mismatch'));
         }
         // call this after every nontrivial call to the underlying API
         function throwIfError() {

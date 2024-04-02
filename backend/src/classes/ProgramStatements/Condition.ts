@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import { Context } from "../Contexts/Context";
 import { LineNumbers } from "../Types";
 import { ContextConditional } from "../Contexts/ContextConditional";
 import { ProgramStatement } from "./ProgramStatement";
