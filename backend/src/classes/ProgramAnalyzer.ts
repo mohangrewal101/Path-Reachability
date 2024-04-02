@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
-import { Context } from "./Context";
+import { CustomContext } from "./CustomContext";
 import { ContextToZ3 } from "./ContextToZ3";
 import { LineNumbers } from "./Types";
 import { getLineNumbers } from "./utils/utils";
@@ -63,7 +63,7 @@ export class ProgramAnalyzer {
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<PathNote[]>((resolve, reject) => {
-      const context = new Context({ topLevel: true });
+      const context = new CustomContext({ topLevel: true });
       this.visitNode(context, sourceFile);
       console.log("=========");
       console.log("GETTING PATHS");
@@ -85,7 +85,7 @@ export class ProgramAnalyzer {
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
-        .checkPaths(context.getPaths())
+        .checkPaths(context)
         .then((notes) => {
           resolve(notes);
         })
@@ -96,7 +96,7 @@ export class ProgramAnalyzer {
     });
   };
 
-  visitNode = (context: Context, node: ts.Node) => {
+  visitNode = (context: CustomContext, node: ts.Node) => {
     if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.kind)) {
       const visitFn = this.jumpTable[node.kind];
       visitFn(context, node);
@@ -111,7 +111,7 @@ export class ProgramAnalyzer {
   };
 
   visitExpressionStatement = (
-    context: Context,
+    context: CustomContext,
     node: ts.ExpressionStatement
   ) => {
     log("visiting expression statement: ", node.getText());
@@ -120,7 +120,7 @@ export class ProgramAnalyzer {
     });
   };
 
-  visitClassDeclaration = (context: Context, node: ts.ClassDeclaration) => {
+  visitClassDeclaration = (context: CustomContext, node: ts.ClassDeclaration) => {
     log("Visiting class declaration: ", node.getText());
 
     node.members.forEach((member) => {
@@ -129,7 +129,7 @@ export class ProgramAnalyzer {
   };
 
   visitPropertyDeclaration = (
-    context: Context,
+    context: CustomContext,
     node: ts.PropertyDeclaration
   ) => {
     log("Visiting property declaration: ", node.getText());
@@ -139,24 +139,24 @@ export class ProgramAnalyzer {
     }
   };
 
-  visitSourceFile = (context: Context, node: ts.SourceFile) => {
+  visitSourceFile = (context: CustomContext, node: ts.SourceFile) => {
     node.statements.forEach((node: ts.Statement) => {
       this.visitNode(context, node);
     });
   };
 
-  visitIfStatement = (context: Context, node: ts.IfStatement) => {
+  visitIfStatement = (context: CustomContext, node: ts.IfStatement) => {
     log("found an if statement");
 
-    let currContext: Context;
+    let currContext: CustomContext;
     if (context.isTopLevel()) {
-      currContext = new Context({ context });
+      currContext = new CustomContext({ context });
       context.addTopLevelNode(currContext);
     } else {
       currContext = context;
     }
 
-    const trueChild = new Context({ context: currContext });
+    const trueChild = new CustomContext({ context: currContext });
     currContext.setTrueChild(trueChild);
     currContext.setCondition(node.expression);
 
@@ -172,20 +172,20 @@ export class ProgramAnalyzer {
     this.visitNode(trueChild, node.thenStatement);
 
     if (node.elseStatement) {
-      const falseChild = new Context({ context: currContext });
+      const falseChild = new CustomContext({ context: currContext });
       currContext.setFalseChild(falseChild);
       this.visitNode(falseChild, node.elseStatement);
     }
   };
 
   visitConditionalExpression = (
-    context: Context,
+    context: CustomContext,
     node: ts.ConditionalExpression
   ) => {
     log("Found a conditional expression: ", node.getText());
   };
 
-  visitBinaryExpression = (context: Context, node: ts.BinaryExpression) => {
+  visitBinaryExpression = (context: CustomContext, node: ts.BinaryExpression) => {
     log("Found a binary expression: ", node.getText());
     this.visitNode(context, node.left);
     this.visitNode(context, node.operatorToken);
@@ -193,31 +193,31 @@ export class ProgramAnalyzer {
   };
 
   visitEqualsGreaterThanToken = (
-    context: Context,
+    context: CustomContext,
     node: ts.EqualsGreaterThanToken
   ) => {
     log("Found a greater than equals token: ", node.getText());
   };
 
-  visitParameter = (context: Context, node: ts.ParameterDeclaration) => {
+  visitParameter = (context: CustomContext, node: ts.ParameterDeclaration) => {
     log("Found a parameter: ", node.name.getText(), ": ", node.type.getText());
     context.addVar(node.name.getText(), node.type.getText());
   };
 
-  visitIdentifier = (context: Context, node: ts.Identifier) => {
+  visitIdentifier = (context: CustomContext, node: ts.Identifier) => {
     log("Found an identifier: ", node.getText());
   };
 
-  visitStringLiteral = (context: Context, node: ts.StringLiteral) => {
+  visitStringLiteral = (context: CustomContext, node: ts.StringLiteral) => {
     log("Found a string literal: ", node.getText());
   };
 
-  visitFirstLiteralToken = (context: Context, node: ts.LiteralToken) => {
+  visitFirstLiteralToken = (context: CustomContext, node: ts.LiteralToken) => {
     log("Found a first literal token: ", node.getText());
   };
 
   visitVariableDeclarationList = (
-    context: Context,
+    context: CustomContext,
     node: ts.VariableDeclarationList
   ) => {
     log("Found a variable declaration list: ", node.getText());
@@ -227,7 +227,7 @@ export class ProgramAnalyzer {
   };
 
   visitVariableDeclaration = (
-    context: Context,
+    context: CustomContext,
     node: ts.VariableDeclaration
   ) => {
     log("Found variable declaration: ", node.getText());
@@ -242,19 +242,19 @@ export class ProgramAnalyzer {
     }
   };
 
-  visitGreaterThanToken = (context: Context, node: ts.Node) => {
+  visitGreaterThanToken = (context: CustomContext, node: ts.Node) => {
     log("Found greater than token: ", node.getText());
   };
 
-  visitLessThanToken = (context: Context, node: ts.Node) => {
+  visitLessThanToken = (context: CustomContext, node: ts.Node) => {
     log("Found less than token: ", node.getText());
   };
 
-  visitNumericLiteral = (context: Context, node: ts.NumericLiteral) => {
+  visitNumericLiteral = (context: CustomContext, node: ts.NumericLiteral) => {
     log("Found a numeric literal: ", node.getText());
   };
 
-  visitArrowFunction = (context: Context, node: ts.ArrowFunction) => {
+  visitArrowFunction = (context: CustomContext, node: ts.ArrowFunction) => {
     log("Found an arrow function: ", node.getText());
     node.parameters.forEach((child) => {
       this.visitNode(context, child);
@@ -262,18 +262,18 @@ export class ProgramAnalyzer {
     this.visitNode(context, node.body);
   };
 
-  visitFirstStatement = (context: Context, node: ts.Statement) => {
+  visitFirstStatement = (context: CustomContext, node: ts.Statement) => {
     log("Visiting first statement: ", node.getText());
     node.getChildren().forEach((node) => {
       this.visitNode(context, node);
     });
   };
 
-  visitEqualsToken = (context: Context, node: ts.EqualsToken) => {
+  visitEqualsToken = (context: CustomContext, node: ts.EqualsToken) => {
     log("Visiting equals token: ", node.getText());
   };
 
-  visitBlock = (context: Context, node: ts.Block) => {
+  visitBlock = (context: CustomContext, node: ts.Block) => {
     log("Visiting block");
 
     node.getChildren().forEach((child) => {
@@ -281,7 +281,7 @@ export class ProgramAnalyzer {
     });
   };
 
-  visitSyntaxList = (context: Context, node: ts.SyntaxList) => {
+  visitSyntaxList = (context: CustomContext, node: ts.SyntaxList) => {
     log("visiting syntax list: ", node.getText());
     node.getChildren().forEach((child) => {
       this.visitNode(context, child);
@@ -289,7 +289,7 @@ export class ProgramAnalyzer {
   };
 
   visitFunctionDeclaration = (
-    context: Context,
+    context: CustomContext,
     node: ts.FunctionDeclaration
   ) => {
     log("Visiting function declaration");
@@ -303,12 +303,12 @@ export class ProgramAnalyzer {
     }
   };
 
-  visitLessThanEqualsToken = (context: Context, node: ts.Node) => {
+  visitLessThanEqualsToken = (context: CustomContext, node: ts.Node) => {
     log("Visiting less than equals token: ", node.getText());
   };
 
   visitPropertyAccessExpression = (
-    context: Context,
+    context: CustomContext,
     node: ts.PropertyAccessExpression
   ) => {
     log("Visiting property access expression: ", node.getText());
@@ -317,11 +317,11 @@ export class ProgramAnalyzer {
     this.visitNode(context, node.name);
   };
 
-  visitReturnStatement = (context: Context, node: ts.Node) => {
+  visitReturnStatement = (context: CustomContext, node: ts.Node) => {
     log("Visiting return statement: ", node.getText());
   };
 
-  visitThisKeyword = (context: Context, node: ts.Node) => {
+  visitThisKeyword = (context: CustomContext, node: ts.Node) => {
     log("Visiting ThisKeyword: ", node.getText());
   };
 }

@@ -3,19 +3,19 @@ import { Condition } from "./Condition";
 import { LineNumbers } from "./Types";
 
 interface ContextConstructorInterface {
-  context?: Context;
+  context?: CustomContext;
   topLevel?: boolean;
 }
 
-export class Context {
+export class CustomContext {
   private topLevel = false;
   private vars: { [key: string]: string } = {};
   private trueBlock: number[] = [];
   private falseBlock: number[] = [];
-  private trueChild: Context;
-  private falseChild: Context;
+  private trueChild: CustomContext;
+  private falseChild: CustomContext;
   private condition: ts.Expression;
-  private contextNodes: Context[] = [];
+  private contextNodes: CustomContext[] = [];
   private conditionLineNumbers: LineNumbers;
 
   constructor({ context, topLevel }: ContextConstructorInterface) {
@@ -35,19 +35,19 @@ export class Context {
     return this.vars;
   };
 
-  setTrueChild = (context: Context) => {
+  setTrueChild = (context: CustomContext) => {
     this.trueChild = context;
   };
 
-  setFalseChild = (context: Context) => {
+  setFalseChild = (context: CustomContext) => {
     this.falseChild = context;
   };
 
-  getTrueChild = (): Context => {
+  getTrueChild = (): CustomContext => {
     return this.trueChild;
   };
 
-  getFalseChild = (): Context => {
+  getFalseChild = (): CustomContext => {
     return this.falseChild;
   };
 
@@ -77,7 +77,7 @@ export class Context {
     }
   };
 
-  addTopLevelNode = (context: Context) => {
+  addTopLevelNode = (context: CustomContext) => {
     this.contextNodes.push(context);
   };
 

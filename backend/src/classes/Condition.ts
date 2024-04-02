@@ -1,9 +1,9 @@
 import * as ts from "typescript";
-import { Context } from "./Context";
+import { CustomContext } from "./CustomContext";
 import { LineNumbers } from "./Types";
 
 interface ConditionConstructorInterface {
-  context: Context;
+  context: CustomContext;
   negated: boolean;
 }
 

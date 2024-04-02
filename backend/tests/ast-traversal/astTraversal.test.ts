@@ -2,7 +2,7 @@
 
 import { ProgramAnalyzer } from "../../src/classes/ProgramAnalyzer";
 import * as ts from "typescript";
-import { Context } from "../../src/classes/Context"; // Assuming this is the correct import for Context
+import { CustomContext } from "../../src/classes/CustomContext"; // Assuming this is the correct import for CustomContext
 import * as fs from "fs";
 import * as path from "path";
 
@@ -113,7 +113,7 @@ function getTestContext(file: string) {
   );
   const analyzer = new ProgramAnalyzer();
   analyzer.setSourceFile(sampleFile);
-  const context = new Context({ topLevel: true });
+  const context = new CustomContext({ topLevel: true });
 
   analyzer.visitNode(context, sampleFile);
   return context;

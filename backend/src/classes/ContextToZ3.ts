@@ -1,15 +1,15 @@
 import { CheckSatResult, init } from "z3-solver";
-import { Condition } from "./Condition";
 import { CondLines } from "./Types";
 import { PathNote } from "./Types";
-import { removeAllListeners } from "process";
+import {ConditionEvaluator} from "./ConditionEvaluator";
+import { CustomContext } from "./CustomContext";
 
 export class ContextToZ3 {
-  async checkPaths(paths: Condition[][]): Promise<PathNote[]> {
+  async checkPaths(context: CustomContext): Promise<PathNote[]> {
     const { Context } = await init();
     const { Solver, Bool, Not, And, Int, LT, GE, GT, LE, Eq, Or } = Context("main");
     const notes: PathNote[] = [];
-    for (let path of paths) {
+    for (let path of context.getPaths()) {
       const pathNote: PathNote = {};
       let pathConditions = [];
       let pathParams: { [id: string]: any } = {};
@@ -60,8 +60,10 @@ export class ContextToZ3 {
             }
           }
         }
-        let conditionStringSplit = conditionString.match(
-          /\s*([a-zA-Z0-9_]+|==|!=|<=|>=|[\!\>\<\=\&\|])\s*/g
+        let conditionEvaluator = new ConditionEvaluator(pathParams);
+        pathConditions.push(conditionEvaluator.visitCondition(context, condition.condition));
+/*        let conditionStringSplit = conditionString.match(
+            /\s*([a-zA-Z0-9_]+|==|!=|<=|>=|[\!\>\<\=\&\|])\s*!/g
         );
         let left: any, right: any;
         let conditionValue = null;
@@ -123,8 +125,9 @@ export class ContextToZ3 {
           conditionValue = Not(conditionValue);
         }
 
-        pathConditions.push(conditionValue);
-      });
+        pathConditions.push(conditionValue);*/
+
+      })
 
       const solver = new Solver();
       let combinedPath = And(...pathConditions);
@@ -178,25 +181,8 @@ export class ContextToZ3 {
 
   // Used ChatGPT to get a method to extract content from brackets.
   extractContent(input: string): string[] {
-    const matches = input.match(
-      /\((.*?)\)|!(\w+)|(\w+\s*(?:>\s*|==\s*|!=\s*|<=\s*|>=\s*|<\s*)\w+)|(\w+)/
-    );
-    if (matches) {
-      if (matches[1]) {
-        return matches[1]
-          .split(/\s*>\s*|\s*==\s*|\s*!=\s*|\s*<=\s*|\s*>=\s*|\s*<\s*/)
-          .filter(Boolean);
-      } else if (matches[2]) {
-        return ["!" + matches[2]];
-      } else if (matches[3]) {
-        return matches[3]
-          .split(/\s*>\s*|\s*==\s*|\s*!=\s*|\s*<=\s*|\s*>=\s*|\s*<\s*/)
-          .filter(Boolean);
-      } else if (matches[4]) {
-        return [matches[4]];
-      }
-    }
-    return [];
+    const matches = input.match(/(\w+)/g);
+    return matches ? matches : [];
   }
 
   getAllLineNumbers = (condLineNumbers: number[][]): number[] => {
