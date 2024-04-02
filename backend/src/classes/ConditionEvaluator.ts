@@ -1,6 +1,6 @@
 import * as ts from "typescript";
-import {PrefixUnaryExpression, SyntaxKind} from "typescript";
-import { CustomContext } from "./CustomContext";
+import {SyntaxKind} from "typescript";
+import { Context } from "./Contexts/Context";
 
 const WARNING = true;
 
@@ -41,7 +41,7 @@ export class ConditionEvaluator {
         this.pathParams = pathParams;
     }
 
-    visitCondition = (context: CustomContext, node: ts.Node) => {
+    visitCondition = (context: Context, node: ts.Node) => {
         if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.kind)) {
             const visitFn = this.jumpTable[node.kind];
             return visitFn(context, node);
@@ -55,13 +55,13 @@ export class ConditionEvaluator {
         }
     }
 
-    visitIdentifier = (context: CustomContext, node: ts.Identifier) => {
+    visitIdentifier = (context: Context, node: ts.Identifier) => {
         console.log("Found identifier: ", node.getText());
         return this.pathParams[node.getText().toString()];
     }
 
 
-    visitPrefixUnaryExpression = (context: CustomContext, node: ts.PrefixUnaryExpression) => {
+    visitPrefixUnaryExpression = (context: Context, node: ts.PrefixUnaryExpression) => {
         console.log("Found a prefix unary expression: ", node.getText());
         let unaryValue = this.visitCondition(context, node.getChildren()[0]);
         if (unaryValue == "!") {
@@ -69,7 +69,7 @@ export class ConditionEvaluator {
         }
     }
 
-    visitParenthesizedExpression = (context: CustomContext, node: ts.ParenthesizedExpression) => {
+    visitParenthesizedExpression = (context: Context, node: ts.ParenthesizedExpression) => {
         console.log("Found a parenthesized expression: ", node.getText());
         if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.expression.kind)) {
             const visitFn = this.jumpTable[node.expression.kind];
@@ -84,7 +84,7 @@ export class ConditionEvaluator {
         }
     }
 
-    visitBinaryExpression = (context: CustomContext, node: ts.BinaryExpression) => {
+    visitBinaryExpression = (context: Context, node: ts.BinaryExpression) => {
         console.log("Found a binary expression: ", node.getText());
         if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.operatorToken.kind)) {
             const visitFn = this.jumpTable[node.operatorToken.kind];
@@ -100,17 +100,17 @@ export class ConditionEvaluator {
 
     }
 
-    visitNonNullExpression = (context: CustomContext, node: ts.NonNullExpression) => {
+    visitNonNullExpression = (context: Context, node: ts.NonNullExpression) => {
         console.log("Found non null expression ", node.expression.getText());
     }
 
-    visitExclamationToken = (context: CustomContext, node: ts.ExclamationToken) => {
+    visitExclamationToken = (context: Context, node: ts.ExclamationToken) => {
         console.log("Found exclamation token ", node.getText());
         return "!";
     }
 
 
-    visitBarBarToken = (context: CustomContext, leftNode: ts.Node,
+    visitBarBarToken = (context: Context, leftNode: ts.Node,
                         operatorNode: ts.Node,
                         rightNode: ts.Node) => {
         console.log("Found bar bar token ", operatorNode.getText());
@@ -118,7 +118,7 @@ export class ConditionEvaluator {
             this.visitCondition(context, rightNode));
     }
 
-    visitAmpersandAmpersandToken = (context: CustomContext, leftNode: ts.Node,
+    visitAmpersandAmpersandToken = (context: Context, leftNode: ts.Node,
                                     operatorNode: ts.Node,
                                     rightNode: ts.Node) => {
         console.log("Found ampersand ampersand token ", operatorNode.getText());
@@ -126,7 +126,7 @@ export class ConditionEvaluator {
             this.visitCondition(context, rightNode));
     }
 
-    visitGreaterThanToken = (context: CustomContext, leftNode: ts.Node,
+    visitGreaterThanToken = (context: Context, leftNode: ts.Node,
                           operatorNode: ts.Node,
                           rightNode: ts.Node) => {
         console.log("Found greater than token ", operatorNode.getText());
@@ -135,7 +135,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitEqualsGreaterThanToken = (context: CustomContext, leftNode: ts.Node,
+    visitEqualsGreaterThanToken = (context: Context, leftNode: ts.Node,
                                 operatorNode: ts.EqualsGreaterThanToken,
                                 rightNode: ts.Node) => {
         console.log("Found greater than equals token ", operatorNode.getText());
@@ -143,7 +143,7 @@ export class ConditionEvaluator {
             this.visitCondition(context, rightNode));
     }
 
-    visitLessThanToken = (context: CustomContext, leftNode: ts.Node,
+    visitLessThanToken = (context: Context, leftNode: ts.Node,
                        operatorNode: ts.Node,
                        rightNode: ts.Node) => {
         console.log("Found less than token ", operatorNode.getText());
@@ -152,7 +152,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitLessThanEqualsToken = (context: CustomContext, leftNode: ts.Node,
+    visitLessThanEqualsToken = (context: Context, leftNode: ts.Node,
                              operatorNode: ts.Node,
                              rightNode: ts.Node) => {
         console.log("Found less than equals token ", operatorNode.getText());
@@ -161,7 +161,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitEqualsEqualsToken = (context: CustomContext, leftNode: ts.Node,
+    visitEqualsEqualsToken = (context: Context, leftNode: ts.Node,
                            operatorNode: ts.Node,
                            rightNode: ts.Node) => {
         console.log("Found equals equals token ", operatorNode.getText());
@@ -171,7 +171,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitNotEqualsToken = (context: CustomContext, leftNode: ts.Node,
+    visitNotEqualsToken = (context: Context, leftNode: ts.Node,
                            operatorNode: ts.Node,
                            rightNode: ts.Node) => {
         console.log("Found not equals token ", operatorNode.getText());
@@ -180,7 +180,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitFirstLiteralToken = (context: CustomContext, node: ts.Node) => {
+    visitFirstLiteralToken = (context: Context, node: ts.Node) => {
         console.log("Found a number/literal token: ", node.getText());
         return Number(node.getText());
     }

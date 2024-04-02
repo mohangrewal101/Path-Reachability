@@ -1,19 +1,24 @@
 import * as ts from "typescript";
-import { CustomContext } from "./CustomContext";
-import { LineNumbers } from "./Types";
+import { LineNumbers } from "../Types";
+import { ContextConditional } from "../Contexts/ContextConditional";
+import { ProgramStatement } from "./ProgramStatement";
 
 interface ConditionConstructorInterface {
-  context: CustomContext;
+  context: ContextConditional;
   negated: boolean;
 }
 
-export class Condition {
+/**
+ * Condition program statement class, representing a conditional statement in a TypeScript program.
+ */
+export class Condition extends ProgramStatement {
   vars: { [key: string]: string } = {};
   condition: ts.Expression;
   negated: boolean;
   lineNumbers: LineNumbers;
 
   constructor({ context, negated }: ConditionConstructorInterface) {
+    super();
     this.vars = { ...context.getVars() };
     this.condition = context.getCondition();
     this.negated = negated;

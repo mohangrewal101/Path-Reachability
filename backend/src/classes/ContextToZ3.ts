@@ -1,12 +1,12 @@
 import { CheckSatResult, init } from "z3-solver";
+import { Condition } from "./ProgramStatements/Condition";
 import { CondLines } from "./Types";
 import { PathNote } from "./Types";
 import {ConditionEvaluator} from "./ConditionEvaluator";
-import { CustomContext } from "./CustomContext";
-import {Condition} from "./Condition";
+import { Context } from "./Contexts/Context";
 
 export class ContextToZ3 {
-  async checkPaths(context: CustomContext, paths: Condition[][]): Promise<PathNote[]> {
+  async checkPaths(context: Context, paths: Condition[][]): Promise<PathNote[]> {
     const { Context } = await init();
     let z3Context = Context("main");
     const notes: PathNote[] = [];
