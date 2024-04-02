@@ -11,14 +11,11 @@ const warn = (...args: any[]) => {
     }
 };
 
-// Initialize constants synchronously
-const { Context } = await init();
-const { Solver, Bool, Not, And, Int, LT, GE, GT, LE, Eq, Or } = Context("main");
 
 export class ConditionEvaluator {
-    jumpTable: any;
-    sourceFile: ts.SourceFile | undefined;
+    z3Context;
     pathParams: { [id: string]: any } = {};
+    jumpTable: any;
     constructor(pathParams: { [id: string]: any }) {
         this.pathParams = pathParams;
         this.jumpTable = {
@@ -33,6 +30,12 @@ export class ConditionEvaluator {
             [SyntaxKind.EqualsGreaterThanToken]: this.visitEqualsGreaterThanToken,
             [SyntaxKind.EqualsEqualsToken]: this.visitEqualsEqualsToken,
         };
+
+    }
+
+    init = async() => {
+        const { Context } = await init();
+        this.z3Context = Context("main");
     }
 
     visitCondition(context: CustomContext, node: ts.Expression) {
@@ -50,8 +53,8 @@ export class ConditionEvaluator {
     }
 
     visitIdentifier(context: CustomContext, node: ts.Identifier) {
-        console.log("Got identifier ", node.getText());
-        return this.pathParams[node.getText()];
+        console.log("Got identifier: ", node.getText());
+        return this.pathParams[node.getText().toString()];
     }
 
     visitBinaryExpression(context: CustomContext, node: ts.BinaryExpression) {
@@ -89,7 +92,7 @@ export class ConditionEvaluator {
                           operatorNode: ts.Node,
                           rightNode: ts.Identifier) {
         console.log("Got greater than token ", operatorNode.getText());
-        return GT(this.visitIdentifier(context, leftNode),
+        return this.z3Context.GT(this.visitIdentifier(context, leftNode),
             this.visitIdentifier(context, rightNode));
 
     }
@@ -98,7 +101,7 @@ export class ConditionEvaluator {
                                 operatorNode: ts.EqualsGreaterThanToken,
                                 rightNode: ts.Identifier) {
         console.log("Got greater than equals token ", operatorNode.getText());
-        return GE(this.visitIdentifier(context, leftNode),
+        return this.z3Context.GE(this.visitIdentifier(context, leftNode),
             this.visitIdentifier(context, rightNode));
     }
 
@@ -106,7 +109,7 @@ export class ConditionEvaluator {
                        operatorNode: ts.Node,
                        rightNode: ts.Identifier) {
         console.log("Got less than token ", operatorNode.getText());
-        return LT(this.visitIdentifier(context, leftNode),
+        return this.z3Context.LT(this.visitIdentifier(context, leftNode),
             this.visitIdentifier(context, rightNode));
 
     }
@@ -115,7 +118,7 @@ export class ConditionEvaluator {
                              operatorNode: ts.Node,
                              rightNode: ts.Identifier) {
         console.log("Got less than equals token ", operatorNode.getText());
-        return LE(this.visitIdentifier(context, leftNode),
+        return this.z3Context.LE(this.visitIdentifier(context, leftNode),
             this.visitIdentifier(context, rightNode));
 
     }
@@ -124,7 +127,7 @@ export class ConditionEvaluator {
                            operatorNode: ts.Node,
                            rightNode: ts.Identifier) {
         console.log("Got equals equals token ", operatorNode.getText());
-        return Eq(this.visitIdentifier(context, leftNode),
+        return this.z3Context.Eq(this.visitIdentifier(context, leftNode),
             this.visitIdentifier(context, rightNode));
 
 

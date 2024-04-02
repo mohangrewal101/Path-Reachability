@@ -85,7 +85,7 @@ export class ProgramAnalyzer {
       console.log("Z3 Check");
       const contextToZ3Converter = new ContextToZ3();
       contextToZ3Converter
-        .checkPaths(context)
+        .checkPaths(context, context.getPaths())
         .then((notes) => {
           resolve(notes);
         })
