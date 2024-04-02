@@ -1,7 +1,6 @@
 import * as ts from "typescript";
-import {SyntaxKind} from "typescript";
+import {PrefixUnaryExpression, SyntaxKind} from "typescript";
 import { CustomContext } from "./CustomContext";
-import {init} from "z3-solver";
 
 const WARNING = true;
 
@@ -16,12 +15,15 @@ export class ConditionEvaluator {
     z3Context;
     pathParams: { [id: string]: any } = {};
     jumpTable: any;
-    constructor(pathParams: { [id: string]: any }) {
-        this.pathParams = pathParams;
+    constructor(z3Context) {
+        this.z3Context = z3Context;
         this.jumpTable = {
             [SyntaxKind.Identifier]: this.visitIdentifier,
+            [SyntaxKind.PrefixUnaryExpression]: this.visitPrefixUnaryExpression,
+            [SyntaxKind.ParenthesizedExpression]: this.visitParenthesizedExpression,
             [SyntaxKind.BinaryExpression]: this.visitBinaryExpression,
             [SyntaxKind.NonNullExpression]: this.visitNonNullExpression,
+            [SyntaxKind.ExclamationToken]: this.visitExclamationToken,
             [SyntaxKind.BarBarToken]: this.visitBarBarToken,
             [SyntaxKind.AmpersandAmpersandToken]: this.visitAmpersandAmpersandToken,
             [SyntaxKind.LessThanToken]: this.visitLessThanToken,
@@ -29,22 +31,23 @@ export class ConditionEvaluator {
             [SyntaxKind.GreaterThanToken]: this.visitGreaterThanToken,
             [SyntaxKind.EqualsGreaterThanToken]: this.visitEqualsGreaterThanToken,
             [SyntaxKind.EqualsEqualsToken]: this.visitEqualsEqualsToken,
+            [SyntaxKind.ExclamationEqualsToken]: this.visitNotEqualsToken,
+            [SyntaxKind.FirstLiteralToken]: this.visitFirstLiteralToken
         };
 
     }
 
-    init = async() => {
-        const { Context } = await init();
-        this.z3Context = Context("main");
+    setPathParams = (pathParams: { [id: string]: any }) => {
+        this.pathParams = pathParams;
     }
 
-    visitCondition(context: CustomContext, node: ts.Expression) {
+    visitCondition = (context: CustomContext, node: ts.Node) => {
         if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.kind)) {
             const visitFn = this.jumpTable[node.kind];
             return visitFn(context, node);
         } else {
             warn(
-                "found an unspecified condition: ",
+                "Found an unspecified condition: ",
                 node.getText(),
                 ", ",
                 ts.SyntaxKind[node.kind]
@@ -52,12 +55,36 @@ export class ConditionEvaluator {
         }
     }
 
-    visitIdentifier(context: CustomContext, node: ts.Identifier) {
-        console.log("Got identifier: ", node.getText());
+    visitIdentifier = (context: CustomContext, node: ts.Identifier) => {
+        console.log("Found identifier: ", node.getText());
         return this.pathParams[node.getText().toString()];
     }
 
-    visitBinaryExpression(context: CustomContext, node: ts.BinaryExpression) {
+
+    visitPrefixUnaryExpression = (context: CustomContext, node: ts.PrefixUnaryExpression) => {
+        console.log("Found a prefix unary expression: ", node.getText());
+        let unaryValue = this.visitCondition(context, node.getChildren()[0]);
+        if (unaryValue == "!") {
+            return this.z3Context.Not(this.visitCondition(context, node.operand));
+        }
+    }
+
+    visitParenthesizedExpression = (context: CustomContext, node: ts.ParenthesizedExpression) => {
+        console.log("Found a parenthesized expression: ", node.getText());
+        if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.expression.kind)) {
+            const visitFn = this.jumpTable[node.expression.kind];
+            return visitFn(context, node.expression);
+        } else {
+            warn(
+                "found an unspecified paranthesized expression: ",
+                node.expression.getText(),
+                ", ",
+                ts.SyntaxKind[node.kind]
+            );
+        }
+    }
+
+    visitBinaryExpression = (context: CustomContext, node: ts.BinaryExpression) => {
         console.log("Found a binary expression: ", node.getText());
         if (Object.prototype.hasOwnProperty.call(this.jumpTable, node.operatorToken.kind)) {
             const visitFn = this.jumpTable[node.operatorToken.kind];
@@ -73,68 +100,88 @@ export class ConditionEvaluator {
 
     }
 
-    visitNonNullExpression(context: CustomContext, node: ts.NonNullExpression) {
-        console.log("Got non null expression ", node.expression.getText());
+    visitNonNullExpression = (context: CustomContext, node: ts.NonNullExpression) => {
+        console.log("Found non null expression ", node.expression.getText());
+    }
+
+    visitExclamationToken = (context: CustomContext, node: ts.ExclamationToken) => {
+        console.log("Found exclamation token ", node.getText());
+        return "!";
     }
 
 
-    visitBarBarToken(context: CustomContext, node: ts.Node) {
-        console.log("Got bar bar token ", node.getText());
-
+    visitBarBarToken = (context: CustomContext, leftNode: ts.Node,
+                        operatorNode: ts.Node,
+                        rightNode: ts.Node) => {
+        console.log("Found bar bar token ", operatorNode.getText());
+        return this.z3Context.Or(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
     }
 
-    visitAmpersandAmpersandToken(context: CustomContext, node: ts.Node) {
-        console.log("Got ampersand ampersand token ", node.getText());
-
+    visitAmpersandAmpersandToken = (context: CustomContext, leftNode: ts.Node,
+                                    operatorNode: ts.Node,
+                                    rightNode: ts.Node) => {
+        console.log("Found ampersand ampersand token ", operatorNode.getText());
+        return this.z3Context.And(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
     }
 
-    visitGreaterThanToken(context: CustomContext, leftNode: ts.Identifier,
+    visitGreaterThanToken = (context: CustomContext, leftNode: ts.Node,
                           operatorNode: ts.Node,
-                          rightNode: ts.Identifier) {
-        console.log("Got greater than token ", operatorNode.getText());
-        return this.z3Context.GT(this.visitIdentifier(context, leftNode),
-            this.visitIdentifier(context, rightNode));
+                          rightNode: ts.Node) => {
+        console.log("Found greater than token ", operatorNode.getText());
+        return this.z3Context.GT(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
 
     }
 
-    visitEqualsGreaterThanToken(context: CustomContext, leftNode: ts.Identifier,
+    visitEqualsGreaterThanToken = (context: CustomContext, leftNode: ts.Node,
                                 operatorNode: ts.EqualsGreaterThanToken,
-                                rightNode: ts.Identifier) {
-        console.log("Got greater than equals token ", operatorNode.getText());
-        return this.z3Context.GE(this.visitIdentifier(context, leftNode),
-            this.visitIdentifier(context, rightNode));
+                                rightNode: ts.Node) => {
+        console.log("Found greater than equals token ", operatorNode.getText());
+        return this.z3Context.GE(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
     }
 
-    visitLessThanToken(context: CustomContext, leftNode: ts.Identifier,
+    visitLessThanToken = (context: CustomContext, leftNode: ts.Node,
                        operatorNode: ts.Node,
-                       rightNode: ts.Identifier) {
-        console.log("Got less than token ", operatorNode.getText());
-        return this.z3Context.LT(this.visitIdentifier(context, leftNode),
-            this.visitIdentifier(context, rightNode));
+                       rightNode: ts.Node) => {
+        console.log("Found less than token ", operatorNode.getText());
+        return this.z3Context.LT(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
 
     }
 
-    visitLessThanEqualsToken(context: CustomContext, leftNode: ts.Identifier,
+    visitLessThanEqualsToken = (context: CustomContext, leftNode: ts.Node,
                              operatorNode: ts.Node,
-                             rightNode: ts.Identifier) {
-        console.log("Got less than equals token ", operatorNode.getText());
-        return this.z3Context.LE(this.visitIdentifier(context, leftNode),
-            this.visitIdentifier(context, rightNode));
+                             rightNode: ts.Node) => {
+        console.log("Found less than equals token ", operatorNode.getText());
+        return this.z3Context.LE(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
 
     }
 
-    visitEqualsEqualsToken(context: CustomContext, leftNode: ts.Identifier,
+    visitEqualsEqualsToken = (context: CustomContext, leftNode: ts.Node,
                            operatorNode: ts.Node,
-                           rightNode: ts.Identifier) {
-        console.log("Got equals equals token ", operatorNode.getText());
-        return this.z3Context.Eq(this.visitIdentifier(context, leftNode),
-            this.visitIdentifier(context, rightNode));
+                           rightNode: ts.Node) => {
+        console.log("Found equals equals token ", operatorNode.getText());
+        return this.z3Context.Eq(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode));
 
 
     }
 
-    visitNotEqualsToken(context: CustomContext, node: ts.Node) {
-        console.log("Got not equals token ", node.getText());
+    visitNotEqualsToken = (context: CustomContext, leftNode: ts.Node,
+                           operatorNode: ts.Node,
+                           rightNode: ts.Node) => {
+        console.log("Found not equals token ", operatorNode.getText());
+        return this.z3Context.Not(this.z3Context.Eq(this.visitCondition(context, leftNode),
+            this.visitCondition(context, rightNode)));
 
+    }
+
+    visitFirstLiteralToken = (context: CustomContext, node: ts.Node) => {
+        console.log("Found a number/literal token: ", node.getText());
+        return Number(node.getText());
     }
 }

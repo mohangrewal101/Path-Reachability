@@ -6,7 +6,7 @@ function example3(a: number, b: number, c: number) {
 
     }
 
-    if ((c > b) || (c == b)) {
+    if ((a < c)) {
         // do something
         if (c == b) {
             // do something

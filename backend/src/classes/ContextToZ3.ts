@@ -8,8 +8,9 @@ import {Condition} from "./Condition";
 export class ContextToZ3 {
   async checkPaths(context: CustomContext, paths: Condition[][]): Promise<PathNote[]> {
     const { Context } = await init();
-    const { Solver, Bool, Not, And, Int, LT, GE, GT, LE, Eq, Or } = Context("main");
+    let z3Context = Context("main");
     const notes: PathNote[] = [];
+    let conditionEvaluator = new ConditionEvaluator(z3Context);
     for (let path of paths) {
       const pathNote: PathNote = {};
       let pathConditions = [];
@@ -48,13 +49,13 @@ export class ContextToZ3 {
           switch (conditionVariableType) {
             case "number": {
               if (!(paramKey in pathParams)) {
-                pathParams[paramKey] = Int.const(paramKey);
+                pathParams[paramKey] = z3Context.Int.const(paramKey);
               }
               break;
             }
             case "boolean": {
               if (!(paramKey in pathParams)) {
-                pathParams[paramKey] = Bool.const(paramKey);
+                pathParams[paramKey] = z3Context.Bool.const(paramKey);
               }
 
               satisfyingAssignment[paramKey] = !conditionString.includes("!");
@@ -62,80 +63,17 @@ export class ContextToZ3 {
             }
           }
         }
-
-        let conditionEvaluator = new ConditionEvaluator(pathParams);
-        await conditionEvaluator.init();
-        pathConditions.push(conditionEvaluator.visitCondition(context, condition.condition));
-
-        /*        let conditionStringSplit = conditionString.match(
-                    /\s*([a-zA-Z0-9_]+|==|!=|<=|>=|[\!\>\<\=\&\|])\s*!/g
-                );
-                let left: any, right: any;
-                let conditionValue = null;
-                let conditionOperator = "";
-                //TODO: Make it so more complex conditions can be used ie (b == a) &&/|| (c > d)
-                if (conditionStringSplit.length >= 3) {
-                  if (conditionStringSplit[0].trim() == "!") {
-                    if (conditionStringSplit[1].trim() == "!") {
-                      conditionValue = Not(pathParams[conditionStringSplit[2].trim()]);
-                    } else {
-                      left = pathParams[conditionStringSplit[1].trim()];
-                      conditionOperator = conditionStringSplit[2].trim();
-                      right = pathParams[conditionStringSplit[3].trim()];
-                    }
-                  } else {
-                    left = pathParams[conditionStringSplit[0].trim()];
-                    conditionOperator = conditionStringSplit[1].trim();
-                    right = pathParams[conditionStringSplit[2].trim()];
-                  }
-                } else if (conditionStringSplit.length == 2) {
-                  // This must be a negated bool
-                  conditionValue = pathParams[conditionStringSplit[1].trim()];
-                } else if (conditionStringSplit.length == 1) {
-                  // This must be a bool
-                  conditionValue = pathParams[conditionStringSplit[0].trim()];
-                }
-
-                //Checks the length of the condition to see if it has multiple values
-                if (conditionStringSplit.length >= 3 && conditionStringSplit[1] != "!") {
-                  switch (conditionOperator) {
-                    case ">":
-                      conditionValue = GT(left, right);
-                      break;
-                    case ">=":
-                      conditionValue = GE(left, right);
-                      break;
-                    case "<":
-                      conditionValue = LT(left, right);
-                      break;
-                    case "<=":
-                      conditionValue = Or(LT(left, right));
-                      break;
-                    case "==":
-                      conditionValue = Eq(left, right);
-                      break;
-                    case "!=":
-                      conditionValue = Not(Eq(left, right));
-                      break;
-                    default:
-                      console.error(
-                        `Unsupported operator: ${conditionOperator}`
-                      );
-                      break;
-                  }
-                }
-
-                //Check if condition starts with a NOT value
-                if (conditionStringSplit[0].trim() == "!") {
-                  conditionValue = Not(conditionValue);
-                }
-
-                pathConditions.push(conditionValue);*/
-
+        conditionEvaluator.setPathParams(pathParams);
+        let conditionValue = conditionEvaluator.visitCondition(context, condition.condition);
+        if (condition.negated) {
+          pathConditions.push(z3Context.Not(conditionValue));
+        } else {
+          pathConditions.push(conditionValue);
+        }
       }
 
-      const solver = new Solver();
-      let combinedPath = And(...pathConditions);
+      const solver = new z3Context.Solver();
+      let combinedPath = z3Context.And(...pathConditions);
 
       console.log("Path: [ " + pathConditions.join(", "), "]");
       const condLineNumbers: number[][] = [];
