@@ -23,6 +23,7 @@ export const CodeView = ({ fileContents, note }: CodeViewProps) => {
           width: "100%",
           height: "100%",
           maxHeight: "500px",
+          backgroundColor: "#242424",
         }}
       >
         <Stack

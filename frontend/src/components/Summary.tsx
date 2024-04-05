@@ -41,6 +41,7 @@ export const Summary = ({ note }: SummaryProps) => {
         height: "100%",
         paddingLeft: 2,
         paddingRight: 2,
+        backgroundColor: "#242424",
       }}
     >
       <Stack

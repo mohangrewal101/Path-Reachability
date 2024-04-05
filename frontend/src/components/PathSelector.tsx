@@ -42,7 +42,9 @@ const PathSelectorItem = ({ idx, note, onClick }: PathSelectorItemProps) => {
         cursor: "pointer",
       }}
     >
-      <p style={{ color: note.isSatisfiable === true ? "green" : "red" }}>
+      <p
+        style={{ color: note.isSatisfiable === true ? "DarkGreen" : "DarkRed" }}
+      >
         {idx}
       </p>
     </div>
@@ -69,6 +71,7 @@ export const PathSelector = ({ notes, onSelect }: PathSelectorProps) => {
         maxHeight: "500px",
         overflow: "hidden",
         height: "100%",
+        backgroundColor: "#242424",
       }}
     >
       <>

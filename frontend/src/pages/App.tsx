@@ -24,16 +24,17 @@ function App() {
 
   return (
     <>
-      <h1>Program Analyzer</h1>
+      <Typography variant="h2">MountainPath</Typography>
+      <div style={{ marginTop: 20 }}></div>
       {!loading && (
         <input onChange={uploadFile} type="file" id="myFile" name="filename" />
       )}
       {fileContents &&
         (loading ? (
-          <>
-            <Typography variant="h6">Program is being analyzed</Typography>
-            <CircularProgress />
-          </>
+          <div style={{ marginTop: 20 }}>
+            <Typography variant="body1">Program is being analyzed</Typography>
+            <CircularProgress sx={{ marginTop: 4 }} />
+          </div>
         ) : error ? (
           <Typography sx={{ marginTop: 5, color: "red" }} variant="h6">
             {errorString}
