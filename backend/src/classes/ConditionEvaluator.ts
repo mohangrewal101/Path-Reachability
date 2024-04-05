@@ -108,6 +108,10 @@ export class ConditionEvaluator {
         ", ",
         ts.SyntaxKind[node.kind]
       );
+      throw new Error(
+        "ERROR - Analysis found an unspecified operator: " +
+          node.operatorToken.getText()
+      );
     }
   };
 

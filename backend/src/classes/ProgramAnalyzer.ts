@@ -102,8 +102,13 @@ export class ProgramAnalyzer {
           resolve(notes);
         })
         .catch((error) => {
-          console.error("Error during analysis: ", error);
-          reject(error);
+          console.error("Error during analysis: ", error.message);
+
+          reject(
+            JSON.stringify({
+              error: error.message,
+            })
+          );
         });
     });
   };
@@ -159,7 +164,6 @@ export class ProgramAnalyzer {
 
   visitIfStatement = (context: Context, node: ts.IfStatement) => {
     log("found an if statement");
-
 
     let currContext: ContextConditional = new ContextConditional({ context });
     context.addChild(currContext);
