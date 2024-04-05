@@ -62,7 +62,7 @@ const testAnalyze = async () => {
   `;
 
   const sourceFile = ts.createSourceFile(
-    "file",
+    "temp.ts",
     source,
     ts.ScriptTarget.ES2020,
     true
