@@ -33,7 +33,7 @@ export class ConditionEvaluator {
             [SyntaxKind.ExclamationEqualsToken]: this.visitNotEqualsToken,
             [SyntaxKind.FirstLiteralToken]: this.visitFirstLiteralToken,
             [SyntaxKind.TrueKeyword]: this.visitTrueKeyword,
-            [SyntaxKind.FalseKeyword]: this.visitFalseKeyword
+            [SyntaxKind.FalseKeyword]: this.visitFalseKeyword,
             [SyntaxKind.AsteriskToken]: this.visitAsteriskToken,
             [SyntaxKind.SlashToken]: this.visitAsteriskToken,
             [SyntaxKind.MinusToken]: this.visitMinusToken,
