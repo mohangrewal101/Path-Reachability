@@ -5,7 +5,7 @@ export interface Notes {
 export interface PathNote {
   error?: boolean;
   isSatisfiable?: boolean;
-  satisfyingAssignment?: { [key: string]: number | boolean };
+  satisfyingAssignment?: { [key: string]: string };
   lineNumbers?: number[];
 }
 

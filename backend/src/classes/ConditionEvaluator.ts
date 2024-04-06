@@ -29,10 +29,15 @@ export class ConditionEvaluator {
             [SyntaxKind.LessThanToken]: this.visitLessThanToken,
             [SyntaxKind.LessThanEqualsToken]: this.visitLessThanEqualsToken,
             [SyntaxKind.GreaterThanToken]: this.visitGreaterThanToken,
-            [SyntaxKind.EqualsGreaterThanToken]: this.visitEqualsGreaterThanToken,
+            [SyntaxKind.GreaterThanEqualsToken]: this.visitGreaterThanEqualsToken,
             [SyntaxKind.EqualsEqualsToken]: this.visitEqualsEqualsToken,
             [SyntaxKind.ExclamationEqualsToken]: this.visitNotEqualsToken,
-            [SyntaxKind.FirstLiteralToken]: this.visitFirstLiteralToken
+            [SyntaxKind.FirstLiteralToken]: this.visitFirstLiteralToken,
+            [SyntaxKind.AsteriskToken]: this.visitAsteriskToken,
+            [SyntaxKind.SlashToken]: this.visitAsteriskToken,
+            [SyntaxKind.MinusToken]: this.visitMinusToken,
+            [SyntaxKind.PlusToken]: this.visitPlusToken,
+            [SyntaxKind.PercentToken]: this.visitPercentToken
         };
 
     }
@@ -135,7 +140,7 @@ export class ConditionEvaluator {
 
     }
 
-    visitEqualsGreaterThanToken = (context: Context, leftNode: ts.Node,
+    visitGreaterThanEqualsToken = (context: Context, leftNode: ts.Node,
                                 operatorNode: ts.EqualsGreaterThanToken,
                                 rightNode: ts.Node) => {
         console.log("Found greater than equals token ", operatorNode.getText());
@@ -183,5 +188,40 @@ export class ConditionEvaluator {
     visitFirstLiteralToken = (context: Context, node: ts.Node) => {
         console.log("Found a number/literal token: ", node.getText());
         return Number(node.getText());
+    }
+
+    visitAsteriskToken = (context: Context, leftNode: ts.Node,
+                          operatorNode: ts.Node,
+                          rightNode: ts.Node) => {
+        console.log("Found multiplication token ", operatorNode.getText());
+        return this.visitCondition(context, leftNode).mul(this.visitCondition(context, rightNode));
+    }
+
+    visitSlashToken = (context: Context, leftNode: ts.Node,
+                          operatorNode: ts.Node,
+                          rightNode: ts.Node) => {
+        console.log("Found division token ", operatorNode.getText());
+        return this.visitCondition(context, leftNode).div(this.visitCondition(context, rightNode));
+    }
+
+    visitPlusToken = (context: Context, leftNode: ts.Node,
+                       operatorNode: ts.Node,
+                       rightNode: ts.Node) => {
+        console.log("Found addition token ", operatorNode.getText());
+        return this.visitCondition(context, leftNode).add(this.visitCondition(context, rightNode));
+    }
+
+    visitMinusToken = (context: Context, leftNode: ts.Node,
+                      operatorNode: ts.Node,
+                      rightNode: ts.Node) => {
+        console.log("Found subtraction token ", operatorNode.getText());
+        return this.visitCondition(context, leftNode).sub(this.visitCondition(context, rightNode));
+    }
+
+    visitPercentToken = (context: Context, leftNode: ts.Node,
+                       operatorNode: ts.Node,
+                       rightNode: ts.Node) => {
+        console.log("Found modulo token ", operatorNode.getText());
+        return this.visitCondition(context, leftNode).mod(this.visitCondition(context, rightNode));
     }
 }
