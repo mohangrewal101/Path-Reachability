@@ -15,7 +15,6 @@ export class ContextToZ3 {
       const pathNote: PathNote = {};
       let pathConditions = [];
       let pathParams: { [id: string]: any } = {};
-      let satisfyingAssignment: { [id: string]: any } = {};
       let condArray: CondLines[] = [];
 
       for (const condition of path) {
@@ -57,8 +56,6 @@ export class ContextToZ3 {
               if (!(paramKey in pathParams)) {
                 pathParams[paramKey] = z3Context.Bool.const(paramKey);
               }
-
-              satisfyingAssignment[paramKey] = !conditionString.includes("!");
               break;
             }
           }
@@ -100,14 +97,17 @@ export class ContextToZ3 {
 
       if (result === "sat") {
         console.log("Z3: Path is Satisfiable");
-        const satisfyingAssignmentOutput = Object.entries(satisfyingAssignment)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join(", ");
+        const satisfyingAssignmentOutput = Object.entries(pathParams)
+            .map(([key, value]) => `${key}: ${solver.model().eval(value)}`)
+            .join(", ");
         console.log(
           "Z3 Satisfying Assignment: [ " + satisfyingAssignmentOutput + " ]"
         );
         pathNote.isSatisfiable = true;
-        pathNote.satisfyingAssignment = { ...satisfyingAssignment };
+        pathNote.satisfyingAssignment = {};
+        for (const [key, value] of Object.entries(pathParams)) {
+          pathNote.satisfyingAssignment[key] = solver.model().eval(value).toString();
+        }
         pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
