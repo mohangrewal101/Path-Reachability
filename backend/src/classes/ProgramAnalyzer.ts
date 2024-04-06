@@ -11,8 +11,9 @@ import {
   ContextPathsVisitorContext,
 } from "./Evaluators/ContextEvaluator";
 import { ProgramStatementProcessor } from "./ProgramStatements/ProgramStatementProcessor";
+import { TypescriptValidator } from "./utils/TypescriptValidator";
 
-const LOGGING = true;
+const LOGGING = false;
 const WARNING = true;
 
 const log = (...args: any[]) => {
@@ -69,6 +70,20 @@ export class ProgramAnalyzer {
   analyze = (sourceFile: ts.SourceFile) => {
     this.sourceFile = sourceFile;
     return new Promise<PathNote[]>((resolve, reject) => {
+      const typescriptValidator = new TypescriptValidator();
+      const diagnostics = typescriptValidator.checkProgramIsValidTypescript(
+        sourceFile.getFullText()
+      );
+
+      if (diagnostics.length > 0) {
+        reject(
+          JSON.stringify({
+            error: `Analysis cannot be completed as source file does not meet precheck requirements: ${diagnostics.join(
+              " "
+            )}`,
+          })
+        );
+      }
       const context = new Context({});
       this.visitNode(context, sourceFile);
       console.log("=========");
@@ -102,8 +117,13 @@ export class ProgramAnalyzer {
           resolve(notes);
         })
         .catch((error) => {
-          console.error("Error during analysis: ", error);
-          reject(error);
+          console.error("Error during analysis: ", error.message);
+
+          reject(
+            JSON.stringify({
+              error: error.message,
+            })
+          );
         });
     });
   };
@@ -159,7 +179,6 @@ export class ProgramAnalyzer {
 
   visitIfStatement = (context: Context, node: ts.IfStatement) => {
     log("found an if statement");
-
 
     let currContext: ContextConditional = new ContextConditional({ context });
     context.addChild(currContext);

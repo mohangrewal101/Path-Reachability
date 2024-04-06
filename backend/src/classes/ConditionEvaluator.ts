@@ -1,15 +1,14 @@
 import * as ts from "typescript";
-import {SyntaxKind} from "typescript";
+import { SyntaxKind } from "typescript";
 import { Context } from "./Contexts/Context";
 
 const WARNING = true;
 
 const warn = (...args: any[]) => {
-    if (WARNING) {
-        console.warn(...args);
-    }
+  if (WARNING) {
+    console.warn(...args);
+  }
 };
-
 
 export class ConditionEvaluator {
     z3Context;
@@ -33,6 +32,8 @@ export class ConditionEvaluator {
             [SyntaxKind.EqualsEqualsToken]: this.visitEqualsEqualsToken,
             [SyntaxKind.ExclamationEqualsToken]: this.visitNotEqualsToken,
             [SyntaxKind.FirstLiteralToken]: this.visitFirstLiteralToken,
+            [SyntaxKind.TrueKeyword]: this.visitTrueKeyword,
+            [SyntaxKind.FalseKeyword]: this.visitFalseKeyword
             [SyntaxKind.AsteriskToken]: this.visitAsteriskToken,
             [SyntaxKind.SlashToken]: this.visitAsteriskToken,
             [SyntaxKind.MinusToken]: this.visitMinusToken,
@@ -188,6 +189,14 @@ export class ConditionEvaluator {
     visitFirstLiteralToken = (context: Context, node: ts.Node) => {
         console.log("Found a number/literal token: ", node.getText());
         return Number(node.getText());
+    }
+    
+    visitTrueKeyword = (context: Context, node: ts.Node) => {
+        return true;
+    }
+    
+    visitFalseKeyword = (context: Context, node: ts.Node) => {
+        return false;
     }
 
     visitAsteriskToken = (context: Context, leftNode: ts.Node,

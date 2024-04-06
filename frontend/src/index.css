@@ -28,6 +28,10 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(to bottom, rgba(36, 36, 36, 0.95), #242424 65%),
+    url("mountain_range.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 h1 {
