@@ -1,7 +1,9 @@
 import { Context } from "../Contexts/Context";
+import { ContextAssignment } from "../Contexts/ContextAssignment";
 import { ContextConditional } from "../Contexts/ContextConditional";
 import { Condition } from "../ProgramStatements/Condition";
 import { ProgramStatement } from "../ProgramStatements/ProgramStatement";
+import { VariableAssignment } from "../ProgramStatements/VariableAssignment";
 
 /**
  * Helper class used for maintaining the list of program paths while traversing the Context n-ary tree.
@@ -55,6 +57,7 @@ export class ContextPathsEvaluator {
     this.jumpTable = {
       Context: this.visitContext,
       ContextConditional: this.visitContextConditional,
+      ContextAssignment: this.visitContextVariableAssignment,
     };
   }
 
@@ -99,4 +102,19 @@ export class ContextPathsEvaluator {
 
   // TODO: Expand this class to visit additional Context children class types (i.e. Variable Declarations and Variable Assignments)
   // visit methods for these classes probably only need to call the addToAllPaths method of the ContextPathsVisitorContext
+  visitContextVariableAssignment = (
+    context: ContextPathsVisitorContext,
+    node: ContextAssignment
+  ) => {
+    console.log("Visiting Context Variable Assignment");
+    context.addToAllPaths(
+      new VariableAssignment({
+        variableName: node.getVarName(),
+        assignment: node.getExpression(),
+      })
+    );
+    node.getChildren().forEach((child) => {
+      this.visit(context, child);
+    });
+  };
 }

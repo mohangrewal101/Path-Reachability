@@ -21,6 +21,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.3",
+    "ts-morph": "^22.0.0",
     "z3-solver": "^4.13.0"
   }
 }

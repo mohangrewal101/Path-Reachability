@@ -1,16 +1,16 @@
 import * as ts from "typescript";
 import { SyntaxKind } from "typescript";
-import { Context } from "./Contexts/Context";
-import { ContextConditional } from "./Contexts/ContextConditional";
 import { ContextToZ3 } from "./ContextToZ3";
-import { LineNumbers } from "./Types";
-import { getLineNumbers } from "./utils/utils";
-import { PathNote } from "./Types";
+import { Context } from "./Contexts/Context";
+import { ContextAssignment } from "./Contexts/ContextAssignment";
+import { ContextConditional } from "./Contexts/ContextConditional";
 import {
   ContextPathsEvaluator,
   ContextPathsVisitorContext,
 } from "./Evaluators/ContextEvaluator";
 import { ProgramStatementProcessor } from "./ProgramStatements/ProgramStatementProcessor";
+import { LineNumbers, PathNote } from "./Types";
+import { getLineNumbers } from "./utils/utils";
 import { TypescriptValidator } from "./utils/TypescriptValidator";
 
 const LOGGING = false;
@@ -94,6 +94,7 @@ export class ProgramAnalyzer {
       contextEvaluator.visit(visitorContext, context);
 
       const programStatementLists = visitorContext.getChildPaths();
+
       const programStatementProcessor = new ProgramStatementProcessor();
       const conditionLists =
         programStatementProcessor.processProgramStatementLists(
@@ -147,9 +148,8 @@ export class ProgramAnalyzer {
     node: ts.ExpressionStatement
   ) => {
     log("visiting expression statement: ", node.getText());
-    node.expression.getChildren().forEach((child) => {
-      this.visitNode(context, child);
-    });
+
+    this.visitNode(context, node.expression);
   };
 
   visitClassDeclaration = (context: Context, node: ts.ClassDeclaration) => {
@@ -210,9 +210,17 @@ export class ProgramAnalyzer {
 
   visitBinaryExpression = (context: Context, node: ts.BinaryExpression) => {
     log("Found a binary expression: ", node.getText());
-    this.visitNode(context, node.left);
-    this.visitNode(context, node.operatorToken);
-    this.visitNode(context, node.right);
+
+    if (node.operatorToken.getText() === "=") {
+      let newContext: ContextAssignment = new ContextAssignment({ context });
+      newContext.setVarName(node.left.getText());
+      newContext.setExpression(node.right);
+      context.addChild(newContext);
+    } else {
+      this.visitNode(context, node.left);
+      this.visitNode(context, node.operatorToken);
+      this.visitNode(context, node.right);
+    }
   };
 
   visitEqualsGreaterThanToken = (
@@ -257,6 +265,11 @@ export class ProgramAnalyzer {
     if (node.type) {
       context.addVar(node.name.getText(), node.type?.getText());
     }
+
+    let newContext: ContextAssignment = new ContextAssignment({ context });
+    newContext.setVarName(node.name.getText());
+    newContext.setExpression(node.initializer);
+    context.addChild(newContext);
 
     this.visitNode(context, node.name);
 

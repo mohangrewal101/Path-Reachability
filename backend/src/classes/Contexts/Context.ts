@@ -1,5 +1,3 @@
-import * as ts from "typescript";
-import { Condition } from "../ProgramStatements/Condition";
 import { LineNumbers } from "../Types";
 
 interface ContextConstructorInterface {

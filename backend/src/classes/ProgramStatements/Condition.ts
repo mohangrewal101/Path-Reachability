@@ -1,6 +1,6 @@
 import * as ts from "typescript";
-import { LineNumbers } from "../Types";
 import { ContextConditional } from "../Contexts/ContextConditional";
+import { LineNumbers } from "../Types";
 import { ProgramStatement } from "./ProgramStatement";
 
 interface ConditionConstructorInterface {
@@ -13,7 +13,7 @@ interface ConditionConstructorInterface {
  */
 export class Condition extends ProgramStatement {
   vars: { [key: string]: string } = {};
-  condition: ts.Expression;
+  condition: ts.Node;
   negated: boolean;
   lineNumbers: LineNumbers;
 
@@ -31,5 +31,9 @@ export class Condition extends ProgramStatement {
     } else {
       return this.condition.getText();
     }
+  };
+
+  setCondition = (condition: ts.Expression) => {
+    this.condition = condition;
   };
 }

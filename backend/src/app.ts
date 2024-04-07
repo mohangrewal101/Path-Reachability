@@ -37,18 +37,24 @@ const testZ3 = async () => {
 const testAnalyze = async () => {
   const source = `
   function example(a: boolean, b: boolean, c: boolean) {
-    if (a) {
-      // do something
+    let d = 1;
+    d = 2; 
+    d = 3; 
+    a = true;
+    if (a == b) {
+      d = 4;
+      b= false;
     } else {
-      // do something else
+      d = 5;
+      b = true;
     }
   
     if (b) {
       // do something
       if (c) {
-        // do something
+        a = false;
       } else {
-        // do something else
+        a = true;
       }
     } else {
       if (a) {
@@ -72,4 +78,4 @@ const testAnalyze = async () => {
   const analyzerNotes = await programAnalyzer.analyze(sourceFile);
   return analyzerNotes;
 };
-testAnalyze();
+// testAnalyze();

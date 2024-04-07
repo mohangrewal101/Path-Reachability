@@ -1,12 +1,14 @@
 import { CheckSatResult, init } from "z3-solver";
-import { Condition } from "./ProgramStatements/Condition";
-import { CondLines } from "./Types";
-import { PathNote } from "./Types";
-import {ConditionEvaluator} from "./ConditionEvaluator";
+import { ConditionEvaluator } from "./ConditionEvaluator";
 import { Context } from "./Contexts/Context";
+import { Condition } from "./ProgramStatements/Condition";
+import { CondLines, PathNote } from "./Types";
 
 export class ContextToZ3 {
-  async checkPaths(context: Context, paths: Condition[][]): Promise<PathNote[]> {
+  async checkPaths(
+    context: Context,
+    paths: Condition[][]
+  ): Promise<PathNote[]> {
     const { Context } = await init();
     let z3Context = Context("main");
     const notes: PathNote[] = [];
@@ -45,23 +47,32 @@ export class ContextToZ3 {
 
         for (let paramKey of extractedContent) {
           let conditionVariableType = condition.vars[paramKey];
-          switch (conditionVariableType) {
-            case "number": {
-              if (!(paramKey in pathParams)) {
-                pathParams[paramKey] = z3Context.Int.const(paramKey);
-              }
-              break;
+          if (conditionVariableType == "number") {
+            if (!(paramKey in pathParams)) {
+              pathParams[paramKey] = z3Context.Int.const(paramKey);
             }
-            case "boolean": {
-              if (!(paramKey in pathParams)) {
-                pathParams[paramKey] = z3Context.Bool.const(paramKey);
-              }
-              break;
+          } else if (conditionVariableType == "boolean") {
+            if (!(paramKey in pathParams)) {
+              pathParams[paramKey] = z3Context.Bool.const(paramKey);
             }
+          } else if (paramKey == "true") {
+            pathParams[paramKey] = true;
+          } else if (paramKey == "false") {
+            pathParams[paramKey] = false;
+          } else if (Number.isInteger(parseInt(paramKey))) {
+            console.log("paramkey", paramKey, "getting added here");
+            pathParams[paramKey] = parseInt(paramKey);
+          } else {
+            pathParams[paramKey] = paramKey;
           }
         }
+
         conditionEvaluator.setPathParams(pathParams);
-        let conditionValue = conditionEvaluator.visitCondition(context, condition.condition);
+
+        let conditionValue = conditionEvaluator.visitCondition(
+          context,
+          condition.condition
+        );
         if (condition.negated) {
           pathConditions.push(z3Context.Not(conditionValue));
         } else {
@@ -92,22 +103,30 @@ export class ContextToZ3 {
       });
 
       solver.add(combinedPath);
-
       const result: CheckSatResult = await solver.check();
 
       if (result === "sat") {
         console.log("Z3: Path is Satisfiable");
         const satisfyingAssignmentOutput = Object.entries(pathParams)
-            .map(([key, value]) => `${key}: ${solver.model().eval(value)}`)
-            .join(", ");
+          .filter(([key, val]) => {
+            return !(typeof val === "boolean" || typeof val === "number");
+          })
+          .map(([key, value]) => `${key}: ${solver.model().eval(value)}`)
+          .join(", ");
         console.log(
           "Z3 Satisfying Assignment: [ " + satisfyingAssignmentOutput + " ]"
         );
         pathNote.isSatisfiable = true;
         pathNote.satisfyingAssignment = {};
         for (const [key, value] of Object.entries(pathParams)) {
-          pathNote.satisfyingAssignment[key] = solver.model().eval(value).toString();
+          if (!(typeof value === "boolean" || typeof value === "number")) {
+            pathNote.satisfyingAssignment[key] = solver
+              .model()
+              .eval(value)
+              .toString();
+          }
         }
+        console.log("alex test: ", solver.model().decls());
         pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
