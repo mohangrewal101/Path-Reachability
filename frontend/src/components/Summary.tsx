@@ -28,6 +28,13 @@ const tooltipText = (
       If the path conditions are satisfiable, it will indicate which function
       parameter values are required to execute the path.
     </p>
+    <p>
+      Note that the application may indicate a parameter can be assigned to
+      itself in a satisfying assignment. This indicates it does not matter what
+      value the parameter is set to, the path of conditions will be satisfiable
+      regardless. The same applies if a function parameter is not included in a
+      satisfying assignment.
+    </p>
   </>
 );
 

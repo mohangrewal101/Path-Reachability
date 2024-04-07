@@ -107,7 +107,7 @@ export class ReassignmentHelper {
     condition: Condition,
     vars: { [key: string]: string }
   ): Condition {
-    const contextToZ3 = new ContextToZ3();
+    const contextToZ3 = new ContextToZ3({ lastLineNumber: 0 });
     const params = contextToZ3.extractContent(condition.condition.getText());
     let newParams = [];
     params.forEach((param) => {

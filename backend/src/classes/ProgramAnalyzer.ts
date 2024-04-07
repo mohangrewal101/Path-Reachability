@@ -12,6 +12,7 @@ import { ProgramStatementProcessor } from "./ProgramStatements/ProgramStatementP
 import { LineNumbers, PathNote } from "./Types";
 import { getLineNumbers } from "./utils/utils";
 import { TypescriptValidator } from "./utils/TypescriptValidator";
+import { getLastLineNumber } from "./utils/utils";
 
 const LOGGING = false;
 const WARNING = true;
@@ -84,6 +85,7 @@ export class ProgramAnalyzer {
           })
         );
       }
+      const programLastLineNumber = getLastLineNumber(sourceFile);
       const context = new Context({});
       this.visitNode(context, sourceFile);
       console.log("=========");
@@ -111,7 +113,9 @@ export class ProgramAnalyzer {
       });
 
       console.log("Z3 Check");
-      const contextToZ3Converter = new ContextToZ3();
+      const contextToZ3Converter = new ContextToZ3({
+        lastLineNumber: programLastLineNumber,
+      });
       contextToZ3Converter
         .checkPaths(context, conditionLists)
         .then((notes) => {

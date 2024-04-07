@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useFileUpload } from "../hooks/useFileUpload";
 import { useAnalyzeProgram } from "../hooks/useAnalyzeProgram";
 import { CodeView } from "../components/CodeView";
-import { Container, Grid, Typography } from "@mui/material";
+import { Container, Grid, Typography, Box } from "@mui/material";
 import { Summary } from "../components/Summary";
 import { PathNote } from "../hooks/useAnalyzeProgram";
 import { PathSelector } from "../components/PathSelector";
@@ -36,9 +36,11 @@ function App() {
             <CircularProgress sx={{ marginTop: 4 }} />
           </div>
         ) : error ? (
-          <Typography sx={{ marginTop: 5, color: "red" }} variant="h6">
-            {errorString}
-          </Typography>
+          <Box sx={{ paddingX: 30 }}>
+            <Typography sx={{ marginTop: 5, color: "red" }} variant="h6">
+              {errorString}
+            </Typography>
+          </Box>
         ) : (
           <Container sx={{ width: "100vw", padding: 0, margin: 0 }}>
             <Grid container sx={{ marginTop: 5, width: "100%" }} spacing={1}>

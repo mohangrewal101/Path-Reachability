@@ -5,6 +5,14 @@ import { Condition } from "./ProgramStatements/Condition";
 import { CondLines, PathNote } from "./Types";
 
 export class ContextToZ3 {
+  lastLineNumber: number;
+
+  constructor({ lastLineNumber }) {
+    if (lastLineNumber) {
+      this.lastLineNumber = lastLineNumber;
+    }
+  }
+
   async checkPaths(
     context: Context,
     paths: Condition[][]
@@ -60,7 +68,6 @@ export class ContextToZ3 {
           } else if (paramKey == "false") {
             pathParams[paramKey] = false;
           } else if (Number.isInteger(parseInt(paramKey))) {
-            console.log("paramkey", paramKey, "getting added here");
             pathParams[paramKey] = parseInt(paramKey);
           } else {
             pathParams[paramKey] = paramKey;
@@ -126,7 +133,6 @@ export class ContextToZ3 {
               .toString();
           }
         }
-        console.log("alex test: ", solver.model().decls());
         pathNote.lineNumbers = this.getAllLineNumbers(condLineNumbers);
       } else if (result === "unsat") {
         console.log("Z3: Path is Unsatisfiable");
@@ -157,13 +163,19 @@ export class ContextToZ3 {
       }
     });
 
-    condLineNumbers.forEach((set: number[]) => {
-      for (let i: number = set[0]; i <= set[1]; i++) {
-        if (!avoidLineNumbers.includes(i)) {
-          allLineNumbers.push(i);
-        }
+    for (let i: number = 0; i < this.lastLineNumber; i++) {
+      if (!avoidLineNumbers.includes(i)) {
+        allLineNumbers.push(i);
       }
-    });
+    }
+
+    // condLineNumbers.forEach((set: number[]) => {
+    //   for (let i: number = set[0]; i <= set[1]; i++) {
+    //     if (!avoidLineNumbers.includes(i)) {
+    //       allLineNumbers.push(i);
+    //     }
+    //   }
+    // });
 
     return allLineNumbers;
   };

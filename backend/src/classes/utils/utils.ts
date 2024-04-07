@@ -33,3 +33,16 @@ export const getLineNumbers = (
 
   return lineNumbers;
 };
+
+export const getLastLineNumber = (sourceFile: ts.SourceFile) => {
+  let lastLineNumber = 0;
+  ts.forEachChild(sourceFile, (node) => {
+    const lineNumber = sourceFile.getLineAndCharacterOfPosition(
+      node.getEnd()
+    ).line;
+    if (lineNumber > lastLineNumber) {
+      lastLineNumber = lineNumber;
+    }
+  });
+  return lastLineNumber;
+};
