@@ -74,3 +74,8 @@ It collects information on the function parameters, the line numbers of blocks s
 - **Z3**: This is a theorem prover that can be used to determine the satisfiability of a series of conditional statements. For those satisfiable paths, it outputs the satisfying assignments for each variable appearing in the conditional statements.
 - **React**: This library is used to create the interactive user interface.
 - **Material UI**: This is a React component library, and was used in building out the user interface.
+- **Jest**: This is a testing framework that was used to test the AST traversal and context evaluation.
+
+## Testing
+
+We used the Jest testing framework to write automated tests of the AST traversal and context evaluation. This allowed us to ensure not only that the AST traversal and contaxt evaluation would not crash, but also to ensure that Z3 received the correct input to evaluate. We wrote a number of sample scripts that met the accepted language features to test that the evaluator was able to handle all of these features. These sample scripts were also used to test the frontend and ensure that Z3 did not crash or hang when evaluating the path satisfiability.
