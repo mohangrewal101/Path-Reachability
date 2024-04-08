@@ -18,6 +18,8 @@ After clicking on one of the execution paths, the tool will highlight all the li
 - Whether or not the selected path is "satisfiable". That is, whether this particular execution can be run at all.
 - What the require function parameter assignments would need to be to execute this path.
 
+The analysis can be used by software engineers to ideate on testing strategies, and easily obtain the required function arguments required to test their desired paths.
+
 ## Getting Started
 
 ### System Requirements
@@ -49,8 +51,16 @@ MountainPath can currently analyze TypeScript files with the following propertie
 - The file contains the definition of a single function.
 - The function parameters are either numbers or boolean.
 - The function does not have any loops or function calls.
-- Variables are not reassigned inside the function.
 - Conditional statements inside the function body make use of only the numerical and boolean variables provided in the function parameters, or declared in the function body.
+
+The analysis can:
+
+- Generate the list of all possible paths through the given function.
+- Support programs using `boolean` and `number` type variables.
+- Track variable assignments through the function, and report satisfiability for each path given the variable assignments.
+- Track variable re-assignments through the function.
+
+See the `example_programs` directory for examples of files that can be used during the program analysis in MountainPath.
 
 ## Future Work
 
