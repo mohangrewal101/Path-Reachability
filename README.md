@@ -51,6 +51,7 @@ MountainPath can currently analyze TypeScript files with the following propertie
 - The file contains the definition of a single function.
 - The function parameters are either numbers or boolean.
 - The function does not have any loops or function calls.
+- All variables are explicitly typed in the list of function parameters, or within the function body.
 - Conditional statements inside the function body make use of only the numerical and boolean variables provided in the function parameters, or declared in the function body.
 
 The analysis can:
