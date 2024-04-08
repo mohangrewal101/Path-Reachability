@@ -43,7 +43,7 @@ To run the project, open two terminals and follow these steps:
 
 1. In one terminal, run `cd frontend && npm run dev` from the project root directory.
 2. In a second terminal, run `cd backend && npm run dev` from the project root directory.
-3. Open `http://localhost:5173/` in your web browser.
+3. Open `http://localhost:5173/` in your web browser. Click the **Choose File** button to upload a file and initate the analysis.
 
 ## Analysis Capabilities
 
