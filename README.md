@@ -8,7 +8,7 @@
 4. [Future Work](#future-work)
 5. [How It Works](#how-it-works)
 6. [Libraries Used](#libraries-used)
-7. [Testing)(#testing)
+7. [Testing](#testing)
 
 ## Overview
 
